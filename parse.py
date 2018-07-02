@@ -7,7 +7,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import threading
 
-editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks']
+editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion']
 
 
 def group(lst, n):
@@ -48,14 +48,14 @@ class Gui:
         # --- main GUI and size ---
         self.root = Tk()
         self.root.title('CodeForces Problem Parser')
-        self.root.geometry('310x340+200+200')
+        self.root.geometry('310x370+200+200')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
         # --- main Frame ---
         self.main_frame = LabelFrame(self.root, height=400, width=400, text="Parser", font="Serif")
         self.main_frame.grid(row=0, column=0)
-        self.main_frame.config(background='white')
+        self.main_frame.config(background='white', fg='black')
 
         # --- CF image object ---
         codeforces_image = PhotoImage(file='codeforces-logo.png')
@@ -77,48 +77,46 @@ class Gui:
         # --- problem link label ---
         label1 = Label(self.main_frame, text="Problem Link: ", font="Serif 10 bold")
         label1.grid(row=2, column=0, rowspan=2, sticky='sw')
-        label1.config(background='white')
+        label1.config(background='white', fg='black')
 
         # ---  Problem link entry ---
         self.problem_link_entry = Entry(self.main_frame)
         self.problem_link_entry.grid(row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
-        self.problem_link_entry.config(background='white')
+        self.problem_link_entry.config(background='white', fg='black')
 
         # --- editor label ---
         label2 = Label(self.main_frame, text="Editor: ", font="Serif 10 bold")
         label2.grid(row=4, column=0, rowspan=2, sticky='sw')
-        label2.config(background='white')
+        label2.config(background='white', fg='black')
 
         # --- editors_list' radio buttons ---
-        Radiobutton(self.main_frame, text="Atom", font="Serif", variable=self.editor_choice, value=0).grid(row=5,
-                                                                                                           column=1,
-                                                                                                           sticky=W)
-        Radiobutton(self.main_frame, text="Brackets", font="Serif", variable=self.editor_choice, value=1).grid(row=6,
-                                                                                                               column=1,
-                                                                                                               sticky=W)
-        Radiobutton(self.main_frame, text="Sublime", font="Serif", variable=self.editor_choice, value=2).grid(row=7,
-                                                                                                              column=1,
-                                                                                                              sticky=W)
-        Radiobutton(self.main_frame, text="Geany", font="Serif", variable=self.editor_choice, value=3).grid(row=8,
-                                                                                                            column=1,
-                                                                                                            sticky=W)
-        Radiobutton(self.main_frame, text="Code::Blocks", font="Serif", variable=self.editor_choice, value=4).grid(
-            row=9, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Atom", font="Serif", variable=self.editor_choice, value=0,
+                    background='white', fg='black').grid(row=5, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Brackets", font="Serif", variable=self.editor_choice, value=1,
+                    background='white', fg='black').grid(row=6, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Sublime", font="Serif", variable=self.editor_choice, value=2,
+                    background='white', fg='black').grid(row=7, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Geany", font="Serif", variable=self.editor_choice, value=3,
+                    background='white', fg='black').grid(row=8, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Code::Blocks", font="Serif", variable=self.editor_choice, value=4,
+                    background='white', fg='black').grid(row=9, column=1, sticky=W)
+        Radiobutton(self.main_frame, text="Clion", font="Serif", variable=self.editor_choice, value=5,
+                    background='white', fg='black').grid(row=10, column=1, sticky=W)
 
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
-        self.progressbar.grid(row=10, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.progressbar.grid(row=11, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
 
         # --- parse button ---
-        Button(self.main_frame, text="Parse", font="Serif 14 bold", command=self.parse_start).grid(row=11, column=0,
-                                                                                                   columnspan=2)
+        Button(self.main_frame, text="Parse", font="Serif 14 bold",
+               background='white', fg='black', command=self.parse_start).grid(row=12, column=0, columnspan=2)
 
         # --- status bar ---
         status_bar = Label(self.main_frame, text="by: Kerolloz", font="Serif 10 bold italic", bd=1, relief=SUNKEN,
                            anchor=W)
         status_bar.grid(row=13, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
-        status_bar.config(background='white')
+        status_bar.config(background='white', fg='black')
 
         self.root.mainloop()
 
