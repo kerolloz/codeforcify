@@ -11,6 +11,7 @@ editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion']
 
 
 def group(lst, n):
+    # return a list of list( of n items)
     return zip(*[lst[i::n] for i in range(n)])
 
 
