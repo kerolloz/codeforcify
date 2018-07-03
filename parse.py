@@ -38,6 +38,8 @@ int main (){
 }
 '''
 
+# raw string, so python parser doesn't alter the code or modify it
+
 tester_code = r'''#!/usr/bin/python3
 import os
 import sys
@@ -208,11 +210,11 @@ class Gui:
         directory_name = directory_name.replace('/', '')  # remove slash '/' form the directory name to avoid confusion
 
         os.system('mkdir ' + directory_name)  # create a new folder
-        # os.system('cp test.py ' + directory_name + '/')  # copy tester.exe into the problem folder
         os.chdir(directory_name)  # go to the problem folder
 
         with open('tester.py', 'w') as tester:
             tester.write(tester_code)
+
         with open('main.cpp', 'w') as code:
             code.write(c_code)
 
