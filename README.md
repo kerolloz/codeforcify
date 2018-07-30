@@ -7,7 +7,7 @@ Give me the problem link, code it, and I will do the rest for you
 
 <b>Made for Linux</b>
 
-### </> with  by Kerolloz
+### </> with :heart: by _**Kerolloz**_
 
 # Requirements Installation
 >`python3 requirements-installation.py`
