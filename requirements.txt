@@ -1,0 +1,5 @@
+python3
+gcc
+g++
+python3-tk
+python3-termcolor
