@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
 # CodeForces Problem Parser
 ![codeforces](codeforces-logo.png)
 <br>
@@ -7,7 +9,7 @@ Give me the problem link, code it, and I will do the rest for you
 
 <b>Made for Linux</b>
 
-### </> with :heart: by _**Kerolloz**_
+### </> with <span class="glyphicon glyphicon-heart"></span> by _**Kerolloz**_
 
 # Requirements Installation
 >`python3 requirements-installer.py`
