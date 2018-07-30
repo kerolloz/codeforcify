@@ -1,14 +1,17 @@
-# CodeForces Problem Parser :zap:
+# CodeForces Problem Parser
 ![codeforces](codeforces-logo.png)
 <br>
-Problem Solving Made _easy_  :sunglasses:
-## Solve it FASTER!!!  :watch:
+Problem Solving Made _easy_ 
+## Solve it FASTER!!! 
 Give me the problem link, code it, and I will do the rest for you
 
-<b>Made for linux</b>
+<b>Made for Linux</b>
 
-<br>
- #### </> with :heart: by Kerolloz
->This is a quote <br>
-`Some Code To be Written`
->
+### </> with  by Kerolloz
+
+# Requirements Installation
+>`python3 requirements-installation.py`
+
+# Usage
+
+>`python3 parse.py` <br>
