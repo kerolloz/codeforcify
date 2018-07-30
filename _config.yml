@@ -4,3 +4,4 @@ description: CodeForces Problem Parser and Solution Checker - made for linux
 github:
   zip_url: https://github.com/kerolloz/cf-parser-linux/zipball/master
   tar_url: https://github.com/kerolloz/cf-parser-linux/tarball/master
+show_downloads: true
