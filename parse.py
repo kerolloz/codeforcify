@@ -7,7 +7,9 @@ from tkinter import ttk
 from tkinter import messagebox
 import threading
 
-editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion']
+
+editors_names = ['Atom', 'Brackets', 'Sublime', 'Geany', 'Code::Blocks', 'Clion', 'Gedit'] 
+editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion', 'gedit']
 
 
 def group(lst, n):
@@ -106,7 +108,7 @@ class Gui:
         # --- main GUI and size ---
         self.root = Tk()
         self.root.title('CodeForces Problem Parser')
-        self.root.geometry('310x370+200+200')
+        self.root.geometry('305x340+200+200')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
@@ -148,33 +150,32 @@ class Gui:
         label2.config(background='white', fg='black')
 
         # --- editors_list' radio buttons ---
-        Radiobutton(self.main_frame, text="Atom", font="Serif", variable=self.editor_choice, value=0,
-                    background='white', fg='black').grid(row=5, column=1, sticky=W)
-        Radiobutton(self.main_frame, text="Brackets", font="Serif", variable=self.editor_choice, value=1,
-                    background='white', fg='black').grid(row=6, column=1, sticky=W)
-        Radiobutton(self.main_frame, text="Sublime", font="Serif", variable=self.editor_choice, value=2,
-                    background='white', fg='black').grid(row=7, column=1, sticky=W)
-        Radiobutton(self.main_frame, text="Geany", font="Serif", variable=self.editor_choice, value=3,
-                    background='white', fg='black').grid(row=8, column=1, sticky=W)
-        Radiobutton(self.main_frame, text="Code::Blocks", font="Serif", variable=self.editor_choice, value=4,
-                    background='white', fg='black').grid(row=9, column=1, sticky=W)
-        Radiobutton(self.main_frame, text="Clion", font="Serif", variable=self.editor_choice, value=5,
-                    background='white', fg='black').grid(row=10, column=1, sticky=W)
+        value_counter = 0
+        row_counter = 5
+        for program in editors_names:
+            Radiobutton(self.main_frame, text=program , font="Serif", variable=self.editor_choice, value=value_counter,
+                    background='white', fg='black').grid(row=row_counter, column=1, sticky=W)
+            value_counter += 1
+            row_counter += 1
 
+        row_counter += 1
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
-        self.progressbar.grid(row=11, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.progressbar.grid(row=row_counter, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        row_counter += 1
 
         # --- parse button ---
         Button(self.main_frame, text="Parse", font="Serif 14 bold",
-               background='white', fg='black', command=self.parse_start).grid(row=12, column=0, columnspan=2)
+               background='white', fg='black', command=self.parse_start).grid(row=row_counter, column=0, columnspan=2)
+        row_counter += 1
 
         # --- status bar ---
         status_bar = Label(self.main_frame, text="by: Kerolloz", font="Serif 10 bold italic", bd=1, relief=SUNKEN,
                            anchor=W)
-        status_bar.grid(row=13, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        status_bar.grid(row=row_counter, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
         status_bar.config(background='white', fg='black')
+        row_counter += 1
 
         self.root.mainloop()
 
