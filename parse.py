@@ -9,7 +9,7 @@ import threading
 
 
 editors_names = ['Atom', 'Brackets', 'Sublime', 'Geany', 'Code::Blocks', 'Clion', 'Gedit'] 
-editors_list = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion', 'gedit']
+editors_execution_command = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion', 'gedit']
 
 
 def group(lst, n):
@@ -149,7 +149,7 @@ class Gui:
         label2.grid(row=4, column=0, rowspan=2, sticky='sw')
         label2.config(background='white', fg='black')
 
-        # --- editors_list' radio buttons ---
+        # --- editors_execution_command' radio buttons ---
         value_counter = 0
         row_counter = 5
         for program in editors_names:
@@ -249,7 +249,7 @@ class Gui:
         editor_number = self.editor_choice.get()
 
         # open the code using the chosen editor
-        os.system(editors_list[editor_number] + ' ' + directory_name + '/main.cpp')
+        os.system(editors_execution_command[editor_number] + ' ' + directory_name + '/main.cpp')
 
 
 if __name__ == '__main__':
