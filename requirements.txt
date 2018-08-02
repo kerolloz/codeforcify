@@ -3,3 +3,5 @@ gcc
 g++
 python3-tk
 python3-termcolor
+gnome-terminal
+xterm

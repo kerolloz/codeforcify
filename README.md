@@ -4,16 +4,20 @@
 ![codeforces](codeforces-logo.png)
 <br>
 Problem Solving Made _easy_ 
-## Solve it FASTER!!! 
-Give me the problem link, code it, and I will do the rest for you
+# Project Moto
+> Give me the problem link and I will do the rest for you... <br> - _**Kerolloz**_
 
-<b>Made for Linux</b>
-
-### </> with <span class="glyphicon glyphicon-heart"></span> by _**Kerolloz**_
 
 # Requirements Installation
->`python3 requirements-installer.py`
+```bash
+python3 requirements-installer.py
+```
 
 # Usage
 
->`python3 parse.py` <br>
+```bash
+python3 parse.py
+```
+<b> </> with <span class="glyphicon glyphicon-heart"></span> by _**Kerolloz**_
+
+Made for Linux</b>
