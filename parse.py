@@ -1,16 +1,21 @@
 #!/usr/bin/python3
 import urllib.error
 import os
-import subprocess
 from urllib.request import urlopen
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import threading
 
-editors_names = ['Atom', 'Brackets', 'Sublime', 'Geany', 'Code::Blocks', 'Clion', 'Gedit',
-                 'Visual Studio Code']
-editors_execution_command = ['atom', 'brackets', 'subl', 'geany', 'codeblocks', 'clion', 'gedit', 'code']
+editors_names = {'Atom': 'atom',
+                 'Brackets': 'brackets',
+                 'Sublime': 'subl',
+                 'Geany': 'geany',
+                 'Code::Blocks': 'codeblocks',
+                 'Clion': 'clion',
+                 'Gedit': 'gedit',
+                 'Visual Studio Code': 'code',
+                 }
 
 
 def group(lst, n):
@@ -118,7 +123,7 @@ class Gui:
         # --- main GUI and size ---
         self.root = Tk()
         self.root.title('CodeForces Problem Parser')
-        self.root.geometry('305x425+200+200')
+        self.root.geometry('305x260+200+200')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
@@ -140,10 +145,6 @@ class Gui:
         self.progress = DoubleVar()
         self.progress.set(0.0)
 
-        # --- chosen editor variable ---
-        self.editor_choice = IntVar()
-        self.editor_choice.set(0)
-
         # --- problem link label ---
         label1 = Label(self.main_frame, text="Problem Link: ", font="Serif 10 bold")
         label1.grid(row=2, column=0, rowspan=2, sticky='sw')
@@ -159,16 +160,18 @@ class Gui:
         label2.grid(row=4, column=0, rowspan=2, sticky='sw')
         label2.config(background='white', fg='black')
 
-        # --- editors_execution_command' radio buttons ---
-        value_counter = 0
+        # --- editors dropdown menu ---
         row_counter = 5
-        for program in editors_names:
-            Radiobutton(self.main_frame, text=program, font="Serif", variable=self.editor_choice, value=value_counter,
-                        background='white', fg='black').grid(row=row_counter, column=1, sticky=W)
-            value_counter += 1
-            row_counter += 1
 
-        row_counter += 1
+        self.editor_choice_name = StringVar()
+
+        self.editor_choice_name.set(list(editors_names.keys())[0])  # set the default option
+
+        dropdown_editors_menu = OptionMenu(self.main_frame, self.editor_choice_name, *editors_names)
+        dropdown_editors_menu.grid(row=row_counter, column=1, rowspan=2)
+
+        row_counter += 2
+
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
@@ -181,6 +184,7 @@ class Gui:
 
         row_counter += 1
 
+        # --- Test button ---
         Button(self.main_frame, text="Test", font="Serif 14 bold",
                background='white', fg='black', command=self.tester).grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
@@ -195,6 +199,8 @@ class Gui:
         self.root.mainloop()
 
     def tester(self):
+        """this function gets called when the Test Button is clicked"""
+
         if self.directory_name == '':
             messagebox.showerror('Problem error', "You haven't parsed any problems yet")
             return
@@ -206,6 +212,7 @@ class Gui:
 
     def parse_start(self):
         """this function gets called when the Parse Button is clicked"""
+
         # create a thread for the progressbar, thread for the main program "parser"
         progress_speed = 8  # progressbar running speed
         progressbar_thread = threading.Thread(target=self.progressbar.start(progress_speed), args=())
@@ -234,8 +241,8 @@ class Gui:
             return
 
         self.directory_name = link[-5:-2] + link[-1:]  # the last letters form the link
-        self.directory_name = self.directory_name.replace('/',
-                                                          '')  # remove slash '/' form the directory name to avoid confusion
+        self.directory_name = self.directory_name.replace('/', '')
+        # remove slash '/' form the directory name to avoid confusion
 
         os.system('mkdir ' + self.directory_name)  # create a new folder
         os.chdir(self.directory_name)  # go to the problem folder
@@ -272,10 +279,8 @@ class Gui:
 
         messagebox.showinfo('CF Parser', 'Problem has been parsed Successfully!')
 
-        editor_number = self.editor_choice.get()
-
         # open the code using the chosen editor
-        os.system(editors_execution_command[editor_number] + ' ' + self.directory_name + '/main.cpp')
+        os.system(editors_names[self.editor_choice_name.get()] + ' ' + self.directory_name + '/main.cpp')
 
 
 if __name__ == '__main__':
