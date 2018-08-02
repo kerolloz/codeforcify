@@ -68,7 +68,7 @@ os.system('clear')
 cprint('Compiling...', 'white', attrs=['dark'])
 dir_path = dir_path.replace(' ', r'\ ')
 
-if os.system('g++ ' + dir_path + '/main.cpp') == 0:  # returned 0 = successful
+if os.system('g++ ' + dir_path + '/main.cpp -o ' + dir_path + '/a.out) == 0:  # returned 0 = successful
     os.system('clear')
     cprint('Compiled successfully...!\n', 'green', attrs=['bold'])
 else:
