@@ -32,7 +32,8 @@ typedef map<string, int> mpsi;
 typedef pair<int, int> pii;
 typedef map<int, string> mpis;
 typedef set<int> si;
-typedef long long int ll;
+typedef long long ll;
+typedef unsigned long long ull;
 
 
 int main (){
