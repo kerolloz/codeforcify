@@ -6,8 +6,8 @@
 Problem Solving Made _easy_
 <br>
 
-* [Requirements Installation](/#Requirements Installation)
-* [Usage ](/#How to use)
+* [Requirements Installation](https://github.com/kerolloz/cf-parser-linux#requirements-installation)
+* [Usage ](https://github.com/kerolloz/cf-parser-linux#how-to-use)
 
 # Requirements Installation
 Requirements installer supports _debian-based_ distributions that uses **apt** package manager.
