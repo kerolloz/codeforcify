@@ -129,7 +129,8 @@ class Gui:
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
         # --- main Frame ---
-        self.main_frame = LabelFrame(self.root, height=400, width=400, text="Parser", font="Serif")
+        self.main_frame = LabelFrame(
+            self.root, height=400, width=400, text="Parser", font="Serif")
         self.main_frame.grid(row=0, column=0)
         self.main_frame.config(background='white', fg='black')
 
@@ -147,13 +148,15 @@ class Gui:
         self.progress.set(0.0)
 
         # --- problem link label ---
-        label1 = Label(self.main_frame, text="Problem Link: ", font="Serif 10 bold")
+        label1 = Label(self.main_frame, text="Problem Link: ",
+                       font="Serif 10 bold")
         label1.grid(row=2, column=0, rowspan=2, sticky='sw')
         label1.config(background='white', fg='black')
 
         # ---  Problem link entry ---
         self.problem_link_entry = Entry(self.main_frame)
-        self.problem_link_entry.grid(row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.problem_link_entry.grid(
+            row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
         self.problem_link_entry.config(background='white', fg='black')
 
         # --- editor label ---
@@ -166,9 +169,11 @@ class Gui:
 
         self.editor_choice_name = StringVar()
 
-        self.editor_choice_name.set(list(editors_names.keys())[0])  # set the default option
+        self.editor_choice_name.set(list(editors_names.keys())[
+                                    0])  # set the default option
 
-        dropdown_editors_menu = OptionMenu(self.main_frame, self.editor_choice_name, *editors_names)
+        dropdown_editors_menu = OptionMenu(
+            self.main_frame, self.editor_choice_name, *editors_names)
         dropdown_editors_menu.grid(row=row_counter, column=1, rowspan=2)
 
         row_counter += 2
@@ -176,7 +181,8 @@ class Gui:
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
-        self.progressbar.grid(row=row_counter, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.progressbar.grid(row=row_counter, column=0,
+                              columnspan=2, sticky=("N", "S", "W", "E"))
         row_counter += 1
 
         # --- parse button ---
@@ -193,7 +199,8 @@ class Gui:
         # --- status bar ---
         status_bar = Label(self.main_frame, text="by: Kerolloz", font="Serif 10 bold italic", bd=1, relief=SUNKEN,
                            anchor=W)
-        status_bar.grid(row=row_counter, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
+        status_bar.grid(row=row_counter, column=0,
+                        columnspan=2, sticky=("N", "S", "W", "E"))
         status_bar.config(background='white', fg='black')
         row_counter += 1
 
@@ -203,7 +210,8 @@ class Gui:
         """this function gets called when the Test Button is clicked"""
 
         if self.directory_name == '':
-            messagebox.showerror('Problem error', "You haven't parsed any problems yet")
+            messagebox.showerror(
+                'Problem error', "You haven't parsed any problems yet")
             return
         dir_path = str(os.path.dirname(os.path.realpath(__file__)))
         dir_path = dir_path.replace(' ', r'\ ')
@@ -216,7 +224,8 @@ class Gui:
 
         # create a thread for the progressbar, thread for the main program "parser"
         progress_speed = 8  # progressbar running speed
-        progressbar_thread = threading.Thread(target=self.progressbar.start(progress_speed), args=())
+        progressbar_thread = threading.Thread(
+            target=self.progressbar.start(progress_speed), args=())
         main_thread = threading.Thread(target=self.start, args=())
         # start the threads to work simultaneously
         progressbar_thread.start()
@@ -230,10 +239,12 @@ class Gui:
         link = str(self.problem_link_entry.get())
 
         try:
-            request = urlopen(link)  # try reading the provided link, and if errors occur, stop
+            # try reading the provided link, and if errors occur, stop
+            request = urlopen(link)
         except (ValueError, urllib.error.HTTPError):
             self.progressbar_reset()
-            messagebox.showerror("Invalid Link", "Please, provide a valid CodeForces problem link !")
+            messagebox.showerror(
+                "Invalid Link", "Please, provide a valid CodeForces problem link !")
             return
         except urllib.error.URLError:
             self.progressbar_reset()
@@ -241,7 +252,8 @@ class Gui:
                                           "connection.")
             return
 
-        self.directory_name = link[-5:-2] + link[-1:]  # the last letters form the link
+        self.directory_name = link[-5:-2] + \
+            link[-1:]  # the last letters form the link
         self.directory_name = self.directory_name.replace('/', '')
         # remove slash '/' form the directory name to avoid confusion
 
@@ -254,7 +266,8 @@ class Gui:
         with open('main.cpp', 'w') as code:
             code.write(c_code)
 
-        html = request.read().decode()  # decode the bytes string to normal string, same as str(request.read())
+        # decode the bytes string to normal string, same as str(request.read())
+        html = request.read().decode()
 
         input_output_list = re.findall('<pre>(.*?)</pre>', html)
         # using regular expressions, return strings between "pre" opening and closing tags in the html code
@@ -266,9 +279,11 @@ class Gui:
         index = 0
         for test in test_cases:
             with open('in' + str(index) + '.txt', 'w') as in_file:
-                in_file.write(test[0].replace('<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
+                in_file.write(test[0].replace(
+                    '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
             with open('out' + str(index) + '.txt', 'w') as out_file:
-                out_file.write(test[1].replace('<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
+                out_file.write(test[1].replace(
+                    '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
             index += 1
 
         with open('test_cases.txt', 'w') as f:
@@ -278,10 +293,12 @@ class Gui:
 
         self.progressbar_reset()
 
-        messagebox.showinfo('CF Parser', 'Problem has been parsed Successfully!')
+        messagebox.showinfo(
+            'CF Parser', 'Problem has been parsed Successfully!')
 
         # open the code using the chosen editor
-        os.system(editors_names[self.editor_choice_name.get()] + ' ' + self.directory_name + '/main.cpp')
+        os.system(editors_names[self.editor_choice_name.get()
+                                ] + ' ' + self.directory_name + '/main.cpp')
 
 
 if __name__ == '__main__':
