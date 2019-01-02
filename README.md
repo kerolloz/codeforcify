@@ -5,6 +5,7 @@
 <br>
 Problem Solving Made _easy_
 <br>
+_currently we support __c++__ solutions only_
 
 * [Requirements Installation](https://github.com/kerolloz/cf-parser-linux#requirements-installation)
 * [Usage ](https://github.com/kerolloz/cf-parser-linux#how-to-use)
