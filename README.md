@@ -20,7 +20,7 @@ Linux users who are **not** using debain-based distribution can still use the pa
 
 # How to use
 1. Run the Parser from the terminal
-```bash
+```shell
 python3 parse.py &!
 ```
 1. Copy and paste the problem link
