@@ -7,15 +7,16 @@ from tkinter import ttk
 from tkinter import messagebox
 import threading
 
-editors_names = {'Atom': 'atom',
-                 'Brackets': 'brackets',
-                 'Sublime': 'subl',
-                 'Geany': 'geany',
-                 'Code::Blocks': 'codeblocks',
-                 'Clion': 'clion',
-                 'Gedit': 'gedit',
-                 'Visual Studio Code': 'code',
-                 }
+editors_names = {
+    'Atom': 'atom',
+    'Brackets': 'brackets',
+    'Sublime': 'subl',
+    'Geany': 'geany',
+    'Code::Blocks': 'codeblocks',
+    'Clion': 'clion',
+    'Gedit': 'gedit',
+    'Visual Studio Code': 'code',
+}
 
 
 def group(lst, n):
@@ -135,7 +136,9 @@ class Gui:
         self.main_frame.config(background='white', fg='black')
 
         # --- CF image object ---
-        codeforces_image = PhotoImage(file='codeforces-logo.png')
+        current_file_path = os.path.dirname(os.path.realpath(__file__))
+        codeforces_image = PhotoImage(
+            file=current_file_path + '/codeforces-logo.png')
 
         # --- CF image label ---
         image_label = Label(self.main_frame)
