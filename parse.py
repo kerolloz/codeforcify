@@ -216,9 +216,8 @@ class Gui:
             messagebox.showerror(
                 'Problem error', "You haven't parsed any problems yet")
             return
-        dir_path = str(os.path.dirname(os.path.realpath(__file__)))
-        dir_path = dir_path.replace(' ', r'\ ')
-        command = 'python3 ' + dir_path + '/' + self.directory_name + '/tester.py'
+
+        command = 'python3 ' + os.getcwd() + '/' + self.directory_name + '/tester.py'
         command_run = "xterm -e 'bash -c \"" + command + "\"'"
         os.system(command_run)
 
@@ -259,7 +258,9 @@ class Gui:
             link[-1:]  # the last letters form the link
         self.directory_name = self.directory_name.replace('/', '')
         # remove slash '/' form the directory name to avoid confusion
-
+        os.chdir(str(os.path.dirname(os.path.realpath(__file__))))
+        # change directory to the parse.py file dir
+        # so when creating the problem folder it gets created in parse.py dir
         os.system('mkdir ' + self.directory_name)  # create a new folder
         os.chdir(self.directory_name)  # go to the problem folder
 
