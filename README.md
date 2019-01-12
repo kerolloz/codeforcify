@@ -37,4 +37,4 @@ python3 parse.py &!
 
 <b> </> with <span class="glyphicon glyphicon-heart">:heart:</span> by _Kerolloz_<br> </b>
 <b>Made for Linux</b><br>
-version: 1.3.2
+<h3> version: 1.4
