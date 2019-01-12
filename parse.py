@@ -6,16 +6,28 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import threading
+try:
+    from bs4 import BeautifulSoup  # try importing BeautifulSoup
+except Exception as e:
+    print(e, "\n------------------------------------------------"
+             "\nYout should have BeautifulSoup installed\n"
+             "You can use the following command to install it\n",
+          "sudo apt-get install python3-bs4\n"
+          "------------------------------------------------"
+          )
+    raise e  # throw an error if not installed
 
-editors_names = {'Atom': 'atom',
-                 'Brackets': 'brackets',
-                 'Sublime': 'subl',
-                 'Geany': 'geany',
-                 'Code::Blocks': 'codeblocks',
-                 'Clion': 'clion',
-                 'Gedit': 'gedit',
-                 'Visual Studio Code': 'code',
-                 }
+
+editors_names = {
+    'Atom': 'atom',
+    'Brackets': 'brackets',
+    'Sublime': 'subl',
+    'Geany': 'geany',
+    'Code::Blocks': 'codeblocks',
+    'Clion': 'clion',
+    'Gedit': 'gedit',
+    'Visual Studio Code': 'code',
+}
 
 
 def group(lst, n):
@@ -135,7 +147,9 @@ class Gui:
         self.main_frame.config(background='white', fg='black')
 
         # --- CF image object ---
-        codeforces_image = PhotoImage(file='codeforces-logo.png')
+        current_file_path = os.path.dirname(os.path.realpath(__file__))
+        codeforces_image = PhotoImage(
+            file=current_file_path + '/codeforces-logo.png')
 
         # --- CF image label ---
         image_label = Label(self.main_frame)
@@ -213,9 +227,8 @@ class Gui:
             messagebox.showerror(
                 'Problem error', "You haven't parsed any problems yet")
             return
-        dir_path = str(os.path.dirname(os.path.realpath(__file__)))
-        dir_path = dir_path.replace(' ', r'\ ')
-        command = 'python3 ' + dir_path + '/' + self.directory_name + '/tester.py'
+
+        command = 'python3 ' + os.getcwd() + '/' + self.directory_name + '/tester.py'
         command_run = "xterm -e 'bash -c \"" + command + "\"'"
         os.system(command_run)
 
@@ -234,6 +247,9 @@ class Gui:
     def progressbar_reset(self):
         self.progress.set(0.0)
         self.progressbar.stop()
+
+    def get_tags_contents(self, html_souped, tag_name, class_name=None):
+        return [tag.contents for tag in html_souped.find_all(tag_name, class_name)]
 
     def start(self):
         link = str(self.problem_link_entry.get())
@@ -256,7 +272,9 @@ class Gui:
             link[-1:]  # the last letters form the link
         self.directory_name = self.directory_name.replace('/', '')
         # remove slash '/' form the directory name to avoid confusion
-
+        os.chdir(str(os.path.dirname(os.path.realpath(__file__))))
+        # change directory to the parse.py file dir
+        # so when creating the problem folder it gets created in parse.py dir
         os.system('mkdir ' + self.directory_name)  # create a new folder
         os.chdir(self.directory_name)  # go to the problem folder
 
@@ -267,9 +285,11 @@ class Gui:
             code.write(c_code)
 
         # decode the bytes string to normal string, same as str(request.read())
-        html = request.read().decode()
+        my_html = request.read().decode().replace(
+            '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
+        html_souped = BeautifulSoup(my_html, 'lxml')
 
-        input_output_list = re.findall('<pre>(.*?)</pre>', html)
+        input_output_list = self.get_tags_contents(html_souped, 'pre')
         # using regular expressions, return strings between "pre" opening and closing tags in the html code
         # "pre" is the tag that contains test cases, whether input or output
 
@@ -279,17 +299,17 @@ class Gui:
         index = 0
         for test in test_cases:
             with open('in' + str(index) + '.txt', 'w') as in_file:
-                in_file.write(test[0].replace(
-                    '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
+                input = ''.join(test[0]).strip()
+                in_file.write(input)
             with open('out' + str(index) + '.txt', 'w') as out_file:
-                out_file.write(test[1].replace(
-                    '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n'))
+                output = ''.join(test[1]).strip()
+                out_file.write(output)
             index += 1
 
         with open('test_cases.txt', 'w') as f:
             f.write(str(index))
 
-        os.chdir('..')  # go to the previous directory
+        os.chdir('..')  # go to the previous directory "parse.py" directory
 
         self.progressbar_reset()
 
