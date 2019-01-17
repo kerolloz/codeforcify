@@ -6,6 +6,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import threading
+import codeforces
+from robobrowser import RoboBrowser
+
 try:
     from bs4 import BeautifulSoup  # try importing BeautifulSoup
 except Exception as e:
@@ -16,7 +19,6 @@ except Exception as e:
           "------------------------------------------------"
           )
     raise e  # throw an error if not installed
-
 
 editors_names = {
     'Atom': 'atom',
@@ -125,18 +127,25 @@ input()
 '''
 
 
-class Gui:
-    directory_name = ''
+def get_tags_contents(html_souped, tag_name, class_name=None):
+    return [tag.contents for tag in html_souped.find_all(tag_name, class_name)]
 
-    def __init__(self):
+
+class Parser:
+    directory_name = ''
+    problem_id = 0
+
+    def __init__(self, shared_tk, shared_browser, username):
         # --- variable for path adding restriction in case of parsing more than one problem
         # to avoid adding editors' paths again
+        self.robo_browser = shared_browser
         self.first_problem = True
+        self.username = username
 
         # --- main GUI and size ---
-        self.root = Tk()
+        self.root = shared_tk
         self.root.title('CodeForces Problem Parser')
-        self.root.geometry('305x260+200+200')
+        self.root.geometry('305x300+200+200')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
@@ -178,17 +187,17 @@ class Gui:
         label2.grid(row=4, column=0, rowspan=2, sticky='sw')
         label2.config(background='white', fg='black')
 
-        # --- editors dropdown menu ---
+        # --- editors drop down menu ---
         row_counter = 5
 
         self.editor_choice_name = StringVar()
 
         self.editor_choice_name.set(list(editors_names.keys())[
-                                    0])  # set the default option
+            0])  # set the default option
 
-        dropdown_editors_menu = OptionMenu(
+        drop_down_editors_menu = OptionMenu(
             self.main_frame, self.editor_choice_name, *editors_names)
-        dropdown_editors_menu.grid(row=row_counter, column=1, rowspan=2)
+        drop_down_editors_menu.grid(row=row_counter, column=1, rowspan=2)
 
         row_counter += 2
 
@@ -200,14 +209,21 @@ class Gui:
         row_counter += 1
 
         # --- parse button ---
-        Button(self.main_frame, text="Parse", font="Serif 14 bold",
-               background='white', fg='black', command=self.parse_start).grid(row=row_counter, column=0, columnspan=2)
-
+        self.parse_button = Button(self.main_frame, text="Parse", font="Serif 14 bold",
+                                   background='white', fg='black', command=self.parse_start)
+        self.parse_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
 
         # --- Test button ---
-        Button(self.main_frame, text="Test", font="Serif 14 bold",
-               background='white', fg='black', command=self.tester).grid(row=row_counter, column=0, columnspan=2)
+        self.test_button = Button(self.main_frame, text="Test", font="Serif 14 bold",
+                                  background='white', fg='black', command=self.tester)
+        self.test_button.grid(row=row_counter, column=0, columnspan=2)
+        row_counter += 1
+
+        # --- Submit button ---
+        self.submit_button = Button(self.main_frame, text="Submit", font="Serif 14 bold",
+                                    background='white', fg='black', command=self.codeforces_submit)
+        self.submit_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
 
         # --- status bar ---
@@ -235,21 +251,23 @@ class Gui:
     def parse_start(self):
         """this function gets called when the Parse Button is clicked"""
 
+        main_thread = threading.Thread(target=self.start, args=())
+        # start the threads to work simultaneously
+        self.start_progressbar()
+        main_thread.start()
+
+    def start_progressbar(self):
+        self.set_state_for_all_buttons(DISABLED)
         # create a thread for the progressbar, thread for the main program "parser"
         progress_speed = 8  # progressbar running speed
         progressbar_thread = threading.Thread(
             target=self.progressbar.start(progress_speed), args=())
-        main_thread = threading.Thread(target=self.start, args=())
-        # start the threads to work simultaneously
         progressbar_thread.start()
-        main_thread.start()
 
-    def progressbar_reset(self):
+    def reset_progressbar(self):
         self.progress.set(0.0)
         self.progressbar.stop()
-
-    def get_tags_contents(self, html_souped, tag_name, class_name=None):
-        return [tag.contents for tag in html_souped.find_all(tag_name, class_name)]
+        self.set_state_for_all_buttons(NORMAL)
 
     def start(self):
         link = str(self.problem_link_entry.get())
@@ -258,19 +276,21 @@ class Gui:
             # try reading the provided link, and if errors occur, stop
             request = urlopen(link)
         except (ValueError, urllib.error.HTTPError):
-            self.progressbar_reset()
+            self.reset_progressbar()
             messagebox.showerror(
                 "Invalid Link", "Please, provide a valid CodeForces problem link !")
             return
         except urllib.error.URLError:
-            self.progressbar_reset()
+            self.reset_progressbar()
             messagebox.showerror("Error", "Connection Error!\nPlease, check the problem link or your internet "
                                           "connection.")
             return
 
-        self.directory_name = link[-5:-2] + \
-            link[-1:]  # the last letters form the link
+        problem_number = re.findall("\d+", link)[0]  # get first match
+        # the last letters form the link
+        self.directory_name = str(problem_number) + link[-1:]
         self.directory_name = self.directory_name.replace('/', '')
+        self.problem_id = self.directory_name
         # remove slash '/' form the directory name to avoid confusion
         os.chdir(str(os.path.dirname(os.path.realpath(__file__))))
         # change directory to the parse.py file dir
@@ -289,7 +309,7 @@ class Gui:
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
         html_souped = BeautifulSoup(my_html, 'lxml')
 
-        input_output_list = self.get_tags_contents(html_souped, 'pre')
+        input_output_list = get_tags_contents(html_souped, 'pre')
         # using regular expressions, return strings between "pre" opening and closing tags in the html code
         # "pre" is the tag that contains test cases, whether input or output
 
@@ -299,8 +319,8 @@ class Gui:
         index = 0
         for test in test_cases:
             with open('in' + str(index) + '.txt', 'w') as in_file:
-                input = ''.join(test[0]).strip()
-                in_file.write(input)
+                input_content = ''.join(test[0]).strip()
+                in_file.write(input_content)
             with open('out' + str(index) + '.txt', 'w') as out_file:
                 output = ''.join(test[1]).strip()
                 out_file.write(output)
@@ -311,16 +331,118 @@ class Gui:
 
         os.chdir('..')  # go to the previous directory "parse.py" directory
 
-        self.progressbar_reset()
+        self.reset_progressbar()
 
         messagebox.showinfo(
             'CF Parser', 'Problem has been parsed Successfully!')
 
         # open the code using the chosen editor
-        os.system(editors_names[self.editor_choice_name.get()
-                                ] + ' ' + self.directory_name + '/main.cpp')
+        os.system(
+            editors_names[self.editor_choice_name.get()] + ' ' + self.directory_name + '/main.cpp')
+
+    def set_state_for_all_buttons(self, state):
+        self.submit_button.config(state=state)
+        self.test_button.config(state=state)
+        self.parse_button.config(state=state)
+
+    def codeforces_submit(self):
+        self.start_progressbar()
+        # returns a tuple (first element is the last submission id)
+        return_value = codeforces.CF_NOT_SUBMITTED_YET
+        if self.problem_id:
+            last_submit_id = codeforces.get_latest_verdict(self.username)[0]
+            messagebox.showinfo('Status', 'Submitting [{1}] for problem [{0}] in [{2}]'
+                                .format(self.problem_id,
+                                        self.directory_name + '/main.cpp',
+                                        "GNU G++17 7.3.0"))
+            return_value = codeforces.submit_problem(self.robo_browser,
+                                                     'GNU G++17 7.3.0',
+                                                     self.problem_id,
+                                                     self.directory_name + '/main.cpp')
+        if return_value == codeforces.CF_ALREADY_SUBMITTED:
+            messagebox.showerror("Error", "File is already submitted before")
+        elif return_value == codeforces.CF_FILE_NOT_FOUND:
+            messagebox.showerror("Error", "File is not found")
+        elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
+            messagebox.showinfo(
+                "Success", "Okay submitted successfully!\nPlease Wait while Judging...")
+            for verdict in codeforces.print_last_verdict_status_for_user(last_submit_id, self.username):
+                messagebox.showinfo("Status", verdict)
+        self.reset_progressbar()
+
+
+class Login:
+
+    def __init__(self, shared_tk):
+        self.root = shared_tk
+        self.main_frame = LabelFrame(
+            self.root, height=500, width=500, text="Login", font="Serif")
+        self.username_entry = Entry(self.main_frame)
+        self.password_entry = Entry(self.main_frame, show="*")
+
+        self.is_logged_in = False
+        self.robo_browser = RoboBrowser(parser='html.parser')
+
+        self.draw_gui()
+
+    def draw_gui(self):
+        self.root.title('CodeForces Login')
+        self.root.geometry('306x167+200+200')
+        self.root.resizable(False, False)
+
+        # --- main Frame ---
+        self.main_frame.grid(row=0, column=0)
+        self.main_frame.config(background='white', fg='black')
+
+        # --- CF image object ---
+        current_file_path = os.path.dirname(os.path.realpath(__file__))
+        codeforces_image = PhotoImage(
+            file=current_file_path + '/codeforces-logo.png')
+
+        # --- CF image label ---
+        image_label = Label(self.main_frame)
+        image_label.config(image=codeforces_image)
+        image_label.grid(row=0, columnspan=2, rowspan=2, sticky='nsew')
+        image_label.config(background='white')
+
+        # --- username label ---
+        username_label = Label(self.main_frame, text="Username: ",
+                               font="Serif 10 bold")
+        username_label.grid(row=2, column=0, rowspan=2, sticky='sw')
+        username_label.config(background='white', fg='black')
+
+        # ---  Problem link entry ---
+        self.username_entry.grid(
+            row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.username_entry.config(background='white', fg='black')
+
+        # --- password label ---
+        password_label = Label(
+            self.main_frame, text="Password: ", font="Serif 10 bold")
+        password_label.grid(row=4, column=0, rowspan=2, sticky='sw')
+        password_label.config(background='white', fg='black')
+
+        # --- password entry ---
+        self.password_entry.grid(
+            row=4, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
+        self.password_entry.config(background='white', fg='black')
+
+        # --- login button ---
+        Button(self.main_frame, text="Login", command=self.codeforces_login).grid(
+            row=6, column=1, columnspan=1)
+
+        self.root.mainloop()
+
+    def codeforces_login(self):
+        if codeforces.login(self.robo_browser, str(self.username_entry.get()), str(self.password_entry.get())):
+            messagebox.showinfo("Success", "Logged in successfully")
+            self.is_logged_in = True
+            Parser(shared_gui, self.robo_browser,
+                   str(self.username_entry.get()))
+        else:
+            messagebox.showerror("Error", "Something went wrong")
 
 
 if __name__ == '__main__':
-    # when the program starts
-    main_application = Gui()
+    shared_gui = Tk()
+    login_gui = Login(shared_gui)
