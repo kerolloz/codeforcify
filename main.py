@@ -7,17 +7,7 @@ from tkinter import messagebox
 import threading
 import codeforces
 from robobrowser import RoboBrowser
-
-try:
-    from bs4 import BeautifulSoup  # try importing BeautifulSoup
-except Exception as e:
-    print(e, "\n------------------------------------------------"
-             "\nYout should have BeautifulSoup installed\n"
-             "You can use the following command to install it\n",
-          "sudo apt-get install python3-bs4\n"
-          "------------------------------------------------"
-          )
-    raise e  # throw an error if not installed
+from bs4 import BeautifulSoup
 
 editors_names = {
     'Atom': 'atom',
