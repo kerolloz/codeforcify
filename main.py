@@ -340,7 +340,7 @@ class Parser:
         return_value = codeforces.CF_NOT_SUBMITTED_YET
         if self.problem_id:
             last_submit_id = codeforces.get_latest_verdict(self.username)[0]
-            messagebox.showinfo('Status', 'Submitting [{1}] for problem [{0}] in [{2}]'
+            messagebox.showinfo('Status', 'Submitting [{1}]\nfor problem [{0}]\nin [{2}]'
                                 .format(self.problem_id,
                                         self.directory_name + '/main.cpp',
                                         "GNU G++17 7.3.0"))
