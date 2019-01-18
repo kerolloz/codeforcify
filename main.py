@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import urllib.error
 import os
 from urllib.request import urlopen
