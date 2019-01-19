@@ -4,8 +4,9 @@ import subprocess
 from termcolor import cprint
 
 
-def get_number_of_text_cases():
-    with open('test_cases.txt', 'r') as number_of_tests_file:
+def get_number_of_test_cases_for(current_dir):
+    # must include current_dir because running it from the parser will raise no file 
+    with open(current_dir + '/test_cases.txt', 'r') as number_of_tests_file:
         number_of_test_cases = int(number_of_tests_file.read())
     return number_of_test_cases
 
@@ -39,8 +40,8 @@ def compare_outputs_of_test(test_index):
 
 if __name__ == '__main__':
 
-    test_cases = get_number_of_text_cases()
     current_directory = get_current_directory()
+    test_cases = get_number_of_test_cases_for(current_directory)
 
     cprint('Compiling...', 'white', attrs=['dark'])
 
