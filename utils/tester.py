@@ -5,7 +5,7 @@ from termcolor import cprint
 
 
 def get_number_of_test_cases_for(current_dir):
-    # must include current_dir because running it from the parser will raise no file 
+    # must include current_dir because running it from the parser will raise no file
     with open(current_dir + '/test_cases.txt', 'r') as number_of_tests_file:
         number_of_test_cases = int(number_of_tests_file.read())
     return number_of_test_cases
