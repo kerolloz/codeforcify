@@ -13,7 +13,7 @@ def safe_get(dictionary, key):
 
     try:
         return dictionary[key]
-    except KeyError:
+    except Exception as e:
         return None
 
 
@@ -63,7 +63,7 @@ def login(browser, username, password):
     return True
 
 
-def submit_problem(browser, solution_language, problem_id, filename):
+def submit_solution_to_problem(browser, solution_language, problem_id, filename):
     """"This method tries to submit codeforces solution to a problem using file"""
 
     cprint('Submitting [{1}] for problem [{0}] in [{2}]'.format(problem_id, filename, solution_language),
@@ -111,8 +111,8 @@ def submit_problem(browser, solution_language, problem_id, filename):
     return CF_SUBMITTED_SUCCESSFULLY
 
 
-def print_last_verdict_status_for_user(last_submit_id, username):
-    """This method tries to print the user last submission verdict"""
+def get_last_verdict_status_for_user(last_submit_id, username):
+    """This method returns the user last submission verdict"""
 
     has_started = False
     while True:
@@ -122,15 +122,18 @@ def print_last_verdict_status_for_user(last_submit_id, username):
         if id_ != last_submit_id and verdict_ != 'TESTING' and verdict_ is not None:
             # check if verdict is set to some value (Not TESTING)
             if verdict_ == 'OK':  # OK = ACCEPTED
-                yield 'ACCEPTED!\nOK - Passed {} tests'.format(passed_test_count_)
+                yield 'ACCEPTED!\n' \
+                      'OK - Passed {} tests\n' \
+                      '{} MS | {} KB'.format(passed_test_count_,time_, memory_)
             else:
                 # NOT ACCEPTED
-                yield "{} on test {}".format(verdict_, passed_test_count_ + 1)
+                yield "{} on test {}\n" \
+                      "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
-            yield '{} MS | {} KB'.format(time_, memory_)
+            yield ''.format()
             break
         elif verdict_ == 'TESTING' and (not has_started):
-            yield "Judgment has begun"
+            yield "\nTesting...\n"
             has_started = True
         time.sleep(0.5)
-        # hold on before making another request "wait for a while till the judge finish testing"
+        # hold on before making another request i.e.: (wait for a while till the judge finish testing)
