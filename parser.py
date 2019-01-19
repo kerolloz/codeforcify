@@ -3,8 +3,8 @@ import shutil
 import urllib.error
 import os
 import threading
+import codeforces
 
-from utils import codeforces
 from urllib.request import urlopen
 from tkinter import *
 from tkinter import ttk
@@ -247,6 +247,8 @@ class Parser:
         self.parse_button.config(state=state)
 
     def codeforces_submit(self):
+        global verdict
+        self.set_state_for_all_buttons(DISABLED)
         return_value = codeforces.CF_NOT_SUBMITTED_YET
         last_submit_id = None
         if self.problem_id:
@@ -269,14 +271,16 @@ class Parser:
         elif return_value == codeforces.CF_FILE_NOT_FOUND:
             messagebox.showerror("Error", "File is not found")
         elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
-            verdict = None
             self.status_bar['text'] = "Okay submitted successfully!\nPlease Wait while Judging..."
+            self.root.update()
+            latest_verdict = None
             for verdict in codeforces.get_last_verdict_status_for_user(last_submit_id, self.username):
                 self.status_bar['text'] = verdict
                 self.root.update()
-            if verdict:
-                messagebox.showinfo("Verdict", verdict)
-                self.status_bar['text'] = "\nStatus: Ok\n"
+                latest_verdict = verdict
+            messagebox.showinfo("Verdict", latest_verdict)
+        self.status_bar['text'] = "\nStatus: Ok\n"
+        self.set_state_for_all_buttons(NORMAL)
 
 
 # Helpful functions

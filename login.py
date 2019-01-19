@@ -1,6 +1,6 @@
 import os
+import codeforces
 
-from utils import codeforces
 from tkinter import *
 from tkinter import messagebox
 

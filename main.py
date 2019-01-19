@@ -1,6 +1,7 @@
 from tkinter import Tk
 from robobrowser import RoboBrowser
-from utils import login, parser
+import login
+import parser
 
 if __name__ == '__main__':
 
