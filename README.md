@@ -11,10 +11,9 @@ _currently we support __c++__ solutions only_
 * [Usage ](https://github.com/kerolloz/cf-parser-linux#how-to-use)
 
 # Requirements Installation
-Requirements installer supports _debian-based_ distributions that uses **apt** package manager.
-
+Install requirements using pip3
 ```bash
-python3 requirements-installer.py
+pip3 install -r requirements.txt
 ```
 Linux users who are **not** using debain-based distribution can still use the parser if they install the programs included in `requirements.txt` file.
 
