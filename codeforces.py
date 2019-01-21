@@ -113,7 +113,7 @@ def submit_solution_to_problem(browser, solution_language, problem_id, filename)
 
 def get_last_verdict_status_for_user(last_submit_id, username):
     """This method returns the user last submission verdict"""
-
+    last_status = None
     has_started = False
     while True:
         # keep trying to get last submission verdict
@@ -122,18 +122,19 @@ def get_last_verdict_status_for_user(last_submit_id, username):
         if id_ != last_submit_id and verdict_ != 'TESTING' and verdict_ is not None:
             # check if verdict is set to some value (Not TESTING)
             if verdict_ == 'OK':  # OK = ACCEPTED
-                yield 'ACCEPTED!\n' \
+                last_status = 'ACCEPTED!\n' \
                       'OK - Passed {} tests\n' \
                       '{} MS | {} KB'.format(passed_test_count_,time_, memory_)
             else:
                 # NOT ACCEPTED
-                yield "{} on test {}\n" \
+                last_status = "{} on test {}\n" \
                       "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
-            yield ''.format()
+            yield last_status
             break
         elif verdict_ == 'TESTING' and (not has_started):
-            yield "\nTesting...\n"
+            last_status = "\nTesting...\n"
             has_started = True
         time.sleep(0.5)
+        yield last_status
         # hold on before making another request i.e.: (wait for a while till the judge finish testing)
