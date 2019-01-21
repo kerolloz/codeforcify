@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-# CodeForces Problem Parser  ![build](https://api.travis-ci.com/kerolloz/cf-parser-linux.svg?)
+# CodeForces Problem Parser  ![build](https://travis-ci.com/kerolloz/cf-parser-linux.svg?token=cvKSoAjxeU9ixCtWSxnx&branch=master)
 ![codeforces](codeforces-logo.png)
 <br>
 Problem Solving Made _easy_
