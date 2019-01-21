@@ -10,11 +10,9 @@ CF_ALREADY_SUBMITTED = -2
 
 def safe_get(dictionary, key):
     """This method tries to get the value of the key from the dictionary safely!"""
-
-    try:
+    if key in dictionary:
         return dictionary[key]
-    except Exception as e:
-        return None
+    return None
 
 
 def get_latest_verdict(user):
