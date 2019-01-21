@@ -278,7 +278,7 @@ class Parser:
             for verdict in codeforces.get_last_verdict_status_for_user(last_submit_id, self.username):
                 self.status_bar['text'] = verdict
                 self.root.update()
-                print(verdict)
+
             messagebox.showinfo("Verdict", verdict)
 
         self.status_bar['text'] = "\nStatus: Ok\n"

@@ -68,11 +68,10 @@ def submit_solution_to_problem(browser, solution_language, problem_id, filename)
 
     cprint('Submitting [{1}] for problem [{0}] in [{2}]'.format(problem_id, filename, solution_language),
            color='green')
-    browser.open('http://codeforces.com/problemset/submit')
-    # get submission form object
-    submit_form = browser.get_form(class_='submit-form')
+
+    browser.open('https://codeforces.com/contest/' + problem_id[:-1] + '/problem/' + problem_id[-1])
+    submit_form = browser.get_form(class_='submitForm')
     # set the problem id to the first command line argument
-    submit_form['submittedProblemCode'] = problem_id
 
     while True:
         try:
@@ -102,7 +101,7 @@ def submit_solution_to_problem(browser, solution_language, problem_id, filename)
 
     browser.submit_form(submit_form)  # submit the source code file
 
-    if browser.url[-6:] != 'status':
+    if browser.url[-3:] != '/my':
         cprint(
             'Failed submission, probably you have submit the same file before', color='red')
         return CF_ALREADY_SUBMITTED
@@ -123,12 +122,12 @@ def get_last_verdict_status_for_user(last_submit_id, username):
             # check if verdict is set to some value (Not TESTING)
             if verdict_ == 'OK':  # OK = ACCEPTED
                 last_status = 'ACCEPTED!\n' \
-                      'OK - Passed {} tests\n' \
-                      '{} MS | {} KB'.format(passed_test_count_,time_, memory_)
+                              'OK - Passed {} tests\n' \
+                              '{} MS | {} KB'.format(passed_test_count_, time_, memory_)
             else:
                 # NOT ACCEPTED
                 last_status = "{} on test {}\n" \
-                      "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
+                              "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
             yield last_status
             break
