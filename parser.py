@@ -247,12 +247,12 @@ class Parser:
         self.parse_button.config(state=state)
 
     def codeforces_submit(self):
-        global verdict
         self.set_state_for_all_buttons(DISABLED)
         return_value = codeforces.CF_NOT_SUBMITTED_YET
         last_submit_id = None
         if self.problem_id:
-            self.status_bar['text'] = "Status: getting last submission id"
+            self.status_bar['text'] = "\nStatus: getting last submission id\n"
+            self.root.update()
             # returns a tuple (first element is the last submission id)
             last_submit_id = codeforces.get_latest_verdict(self.username)[0]
 
@@ -268,17 +268,19 @@ class Parser:
                                                                  self.directory_name + '/main.cpp')
         if return_value == codeforces.CF_ALREADY_SUBMITTED:
             messagebox.showerror("Error", "File is already submitted before")
+
         elif return_value == codeforces.CF_FILE_NOT_FOUND:
             messagebox.showerror("Error", "File is not found")
+
         elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
-            self.status_bar['text'] = "Okay submitted successfully!\nPlease Wait while Judging..."
+            self.status_bar['text'] = "Okay submitted successfully!\nPlease Wait while Judging...\n"
             self.root.update()
-            latest_verdict = None
             for verdict in codeforces.get_last_verdict_status_for_user(last_submit_id, self.username):
                 self.status_bar['text'] = verdict
                 self.root.update()
-                latest_verdict = verdict
-            messagebox.showinfo("Verdict", latest_verdict)
+                print(verdict)
+            messagebox.showinfo("Verdict", verdict)
+
         self.status_bar['text'] = "\nStatus: Ok\n"
         self.set_state_for_all_buttons(NORMAL)
 
