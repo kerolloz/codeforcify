@@ -124,13 +124,13 @@ def get_last_verdict_status_for_user(last_submit_id, username):
                 last_status = 'ACCEPTED!\n' \
                               'OK - Passed {} tests\n' \
                               '{} MS | {} KB'.format(
-                                  passed_test_count_, time_, memory_)
+                               passed_test_count_, time_, memory_)
             else:
                 # NOT ACCEPTED
                 last_status = "{}!\n" \
                               "on test {}\n" \
                               "{} MS | {} KB".format(
-                                  verdict_, passed_test_count_ + 1, time_, memory_)
+                               verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
             yield last_status
             break
