@@ -15,8 +15,6 @@ Install requirements using pip3
 ```bash
 pip3 install -r requirements.txt
 ```
-Linux users who are **not** using debain-based distribution can still use the parser if they install the programs included in `requirements.txt` file.
-
 # How to use
 1. Run the Parser from the terminal
 ```shell
