@@ -12,6 +12,10 @@ _currently we support __c++__ solutions only_
 
 # Requirements Installation
 Install requirements using pip3
+You should have python3, python3-pip & python3-tk installed
+```bash
+sudo apt-get install python3 python3-pip python3-tk
+```
 ```bash
 pip3 install -r requirements.txt
 ```
