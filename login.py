@@ -37,7 +37,7 @@ class Login:
         # --- CF image label ---
         image_label = Label(self.main_frame)
         image_label.config(image=codeforces_image)
-        image_label.grid(row=0, columnspan=2, rowspan=2, sticky='nsew')
+        image_label.grid(row=0, columnspan=3, rowspan=2, sticky='nsew')
         image_label.config(background='white')
 
         # --- username label ---
@@ -71,7 +71,7 @@ class Login:
         by_kerolloz_bar = Label(self.main_frame, text="by: Kerolloz", font="Serif 10 bold italic", bd=1, relief=SUNKEN,
                                 anchor=W)
         by_kerolloz_bar.grid(row=8, column=0,
-                             columnspan=2, sticky=("N", "S", "W", "E"))
+                             columnspan=3, sticky=("N", "S", "W", "E"))
         by_kerolloz_bar.config(background='white', fg='black')
 
         self.root.mainloop()
@@ -90,4 +90,3 @@ class Login:
 
     def get_username(self):
         return str(self.username_entry.get())
-
