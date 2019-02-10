@@ -16,6 +16,7 @@ You should have python3, python3-pip & python3-tk installed
 ```bash
 sudo apt-get install python3 python3-pip python3-tk
 ```
+then after cloning the repository 
 ```bash
 pip3 install -r requirements.txt
 ```
