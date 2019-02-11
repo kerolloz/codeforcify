@@ -135,7 +135,7 @@ class Parser:
         """This function starts the command line tester"""
         self.start_progressbar()
         command = 'python3 ' + os.getcwd() + '/' + self.directory_name + '/tester.py'
-        command_run = "xterm -e 'bash -c \"" + command + "\"'"
+        command_run = "x-terminal-emulator -e 'bash -c \"" + command + "\"'"
         os.system(command_run)
         self.reset_progressbar()
 
