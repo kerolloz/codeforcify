@@ -1,11 +1,9 @@
 import json
 import shutil
-import urllib.error
 import os
 import threading
 import codeforces
 
-from urllib.request import urlopen
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -175,19 +173,7 @@ class Parser:
     def start_parsing(self):
         link = str(self.problem_link_entry.get())
 
-        try:
-            # try reading the provided link, and if errors occur, stop
-            request = urlopen(link)
-        except (ValueError, urllib.error.HTTPError):
-            self.reset_progressbar()
-            messagebox.showerror(
-                "Invalid Link", "Please, provide a valid CodeForces problem link !")
-            return
-        except urllib.error.URLError:
-            self.reset_progressbar()
-            messagebox.showerror("Error", "Connection Error!\nPlease, check the problem link or your internet "
-                                          "connection.")
-            return
+        self.robo_browser.open(link)
 
         problem_number = re.findall(r"\d+", link)[0]  # get first match
         # the last letters form the link
@@ -206,9 +192,9 @@ class Parser:
         os.chdir(self.directory_name)  # go to the problem folder
 
         # decode the bytes string to normal string, same as str(request.read())
-        my_html = request.read().decode().replace(
+        my_html = str(self.robo_browser.select('pre')).replace(
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
-        html_souped = BeautifulSoup(my_html, 'lxml')
+        html_souped = BeautifulSoup(my_html, features="html.parser")
 
         input_output_list = get_tags_contents(html_souped, 'pre')
         # using regular expressions, return strings between "pre" opening and closing tags in the html code
