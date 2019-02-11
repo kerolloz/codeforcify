@@ -97,7 +97,7 @@ class Parser:
 
         # --- parse button ---
         self.parse_button = Button(self.main_frame, text="Parse", font="Serif 14 bold",
-                                   background='white', fg='black', command=self.parse_start)
+                                   background='white', fg='black', command=self.parser)
         self.parse_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
 
@@ -151,10 +151,10 @@ class Parser:
         threading.Thread(target=self.start_testing).start()
         self.reset_progressbar()
 
-    def parse_start(self):
+    def parser(self):
         """this function gets called when the Parse Button is clicked"""
 
-        main_thread = threading.Thread(target=self.start, args=())
+        main_thread = threading.Thread(target=self.start_parsing, args=())
         # start the threads to work simultaneously
         self.start_progressbar()
         main_thread.start()
@@ -172,7 +172,7 @@ class Parser:
         self.progressbar.stop()
         self.set_state_for_all_buttons(NORMAL)
 
-    def start(self):
+    def start_parsing(self):
         link = str(self.problem_link_entry.get())
 
         try:
