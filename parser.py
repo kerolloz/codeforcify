@@ -1,11 +1,9 @@
 import json
 import shutil
-import urllib.error
 import os
 import threading
 import codeforces
 
-from urllib.request import urlopen
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -97,7 +95,7 @@ class Parser:
 
         # --- parse button ---
         self.parse_button = Button(self.main_frame, text="Parse", font="Serif 14 bold",
-                                   background='white', fg='black', command=self.parse_start)
+                                   background='white', fg='black', command=self.parser)
         self.parse_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
 
@@ -135,7 +133,7 @@ class Parser:
         """This function starts the command line tester"""
         self.start_progressbar()
         command = 'python3 ' + os.getcwd() + '/' + self.directory_name + '/tester.py'
-        command_run = "xterm -e 'bash -c \"" + command + "\"'"
+        command_run = "x-terminal-emulator -e 'bash -c \"" + command + "\"'"
         os.system(command_run)
         self.reset_progressbar()
 
@@ -151,10 +149,10 @@ class Parser:
         threading.Thread(target=self.start_testing).start()
         self.reset_progressbar()
 
-    def parse_start(self):
+    def parser(self):
         """this function gets called when the Parse Button is clicked"""
 
-        main_thread = threading.Thread(target=self.start, args=())
+        main_thread = threading.Thread(target=self.start_parsing, args=())
         # start the threads to work simultaneously
         self.start_progressbar()
         main_thread.start()
@@ -172,24 +170,12 @@ class Parser:
         self.progressbar.stop()
         self.set_state_for_all_buttons(NORMAL)
 
-    def start(self):
+    def start_parsing(self):
         link = str(self.problem_link_entry.get())
 
-        try:
-            # try reading the provided link, and if errors occur, stop
-            request = urlopen(link)
-        except (ValueError, urllib.error.HTTPError):
-            self.reset_progressbar()
-            messagebox.showerror(
-                "Invalid Link", "Please, provide a valid CodeForces problem link !")
-            return
-        except urllib.error.URLError:
-            self.reset_progressbar()
-            messagebox.showerror("Error", "Connection Error!\nPlease, check the problem link or your internet "
-                                          "connection.")
-            return
+        self.robo_browser.open(link)
 
-        problem_number = re.findall("\d+", link)[0]  # get first match
+        problem_number = re.findall(r"\d+", link)[0]  # get first match
         # the last letters form the link
         self.directory_name = str(problem_number) + link[-1:]
         self.directory_name = self.directory_name.replace('/', '')
@@ -206,9 +192,9 @@ class Parser:
         os.chdir(self.directory_name)  # go to the problem folder
 
         # decode the bytes string to normal string, same as str(request.read())
-        my_html = request.read().decode().replace(
+        my_html = str(self.robo_browser.select('pre')).replace(
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
-        html_souped = BeautifulSoup(my_html, 'lxml')
+        html_souped = BeautifulSoup(my_html, features="html.parser")
 
         input_output_list = get_tags_contents(html_souped, 'pre')
         # using regular expressions, return strings between "pre" opening and closing tags in the html code
