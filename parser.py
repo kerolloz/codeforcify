@@ -191,13 +191,12 @@ class Parser:
 
         os.chdir(self.directory_name)  # go to the problem folder
 
-        # decode the bytes string to normal string, same as str(request.read())
         my_html = str(self.robo_browser.select('pre')).replace(
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
         html_souped = BeautifulSoup(my_html, features="html.parser")
 
         input_output_list = get_tags_contents(html_souped, 'pre')
-        # using regular expressions, return strings between "pre" opening and closing tags in the html code
+        # using BeautifulSoup, return strings between "pre" tags
         # "pre" is the tag that contains test cases, whether input or output
 
         input_output_group = group(input_output_list, 2)
