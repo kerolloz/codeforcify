@@ -189,7 +189,7 @@ class Parser:
                                           "connection.")
             return
 
-        problem_number = re.findall("\d+", link)[0]  # get first match
+        problem_number = re.findall(r"\d+", link)[0]  # get first match
         # the last letters form the link
         self.directory_name = str(problem_number) + link[-1:]
         self.directory_name = self.directory_name.replace('/', '')
