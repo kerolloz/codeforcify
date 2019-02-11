@@ -32,14 +32,14 @@ pip3 install -r requirements.txt
 python3 main.py
 ```
 
-1.  Copy and paste the problem link
+1.  Login to CodeForces
     <br>![](/screenShots/screen1.png)
-2.  Choose your editor
+2.  Copy and paste the problem link, choose an editor
     <br>![](/screenShots/screen2.png)
 3.  Press **Parse**
-    <br>![](/screenShots/screen3.png)
-4.  The chosen editor will pop up with some pre-written code. Write your solution & save.
+4.  The chosen editor will open up with some [pre-written code](/utils/template.cpp). Write your solution & save.
 5.  Press **Test**
+6.  If ACCEPTED, Press **Submit**
 
 # Project Moto
 
