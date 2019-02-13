@@ -41,12 +41,12 @@ class CodeForcesTests(unittest.TestCase):
         self.setUp()
 
         submission_status = codeforces.submit_solution_to_problem(self.logged_in_browser,
-                                                                  'GNU G++17 7.3.0', '4A',
+                                                                  'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
                                                                   'main.cpp')
         self.assertEqual(submission_status, codeforces.CF_SUBMITTED_SUCCESSFULLY)
 
         submission_status = codeforces.submit_solution_to_problem(self.logged_in_browser,
-                                                                  'GNU G++17 7.3.0', '4A',
+                                                                  'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
                                                                   'main.cpp')
         self.assertEqual(submission_status, codeforces.CF_ALREADY_SUBMITTED)
 
