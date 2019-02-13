@@ -174,6 +174,11 @@ class Parser:
     def start_parsing(self):
         self.problem_link = str(self.problem_link_entry.get())
 
+        if not codeforces.is_a_valid_problem_link(self.problem_link):
+            self.reset_progressbar()
+            messagebox.showerror('Invalid link', 'This is NOT a valid codeforces problem link!')
+            return
+
         try:
             self.robo_browser.open(self.problem_link, timeout=10)
         except Exception:

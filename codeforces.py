@@ -1,3 +1,4 @@
+import re
 import requests
 import time
 from termcolor import cprint
@@ -144,3 +145,6 @@ def get_last_verdict_status_for_user(last_submit_id, username):
         yield last_status
 
 
+def is_a_valid_problem_link(link):
+    codeforces_regex_pattern = r'^http(s)?://(www\.)?codeforces\.com/.*/problem/.*$'
+    return re.match(codeforces_regex_pattern, link)
