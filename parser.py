@@ -20,6 +20,7 @@ class Parser:
         self.robo_browser = logged_in_browser
         self.first_problem = True
         self.username = username
+        self.problem_link = None
 
         # Load the editors from editors.json
         data_file_path = os.path.join(os.path.dirname(
@@ -171,13 +172,18 @@ class Parser:
         self.set_state_for_all_buttons(NORMAL)
 
     def start_parsing(self):
-        link = str(self.problem_link_entry.get())
+        self.problem_link = str(self.problem_link_entry.get())
 
-        self.robo_browser.open(link)
+        try:
+            self.robo_browser.open(self.problem_link, timeout=10)
+        except Exception:
+            self.reset_progressbar()
+            messagebox.showerror('Connection TimeOut', 'Check your internet connection or the problem link')
+            return
 
-        problem_number = re.findall(r"\d+", link)[0]  # get first match
+        problem_number = re.findall(r"\d+", self.problem_link)[0]  # get first match
         # the last letters form the link
-        self.directory_name = str(problem_number) + link[-1:]
+        self.directory_name = str(problem_number) + self.problem_link[-1:]
         self.directory_name = self.directory_name.replace('/', '')
         self.problem_id = self.directory_name
         # remove slash '/' form the directory name to avoid confusion
@@ -249,13 +255,16 @@ class Parser:
 
             return_value = codeforces.submit_solution_to_problem(self.robo_browser,
                                                                  'GNU G++17 7.3.0',
-                                                                 self.problem_id,
+                                                                 self.problem_link,
                                                                  self.directory_name + '/main.cpp')
         if return_value == codeforces.CF_ALREADY_SUBMITTED:
             messagebox.showerror("Error", "File is already submitted before")
 
         elif return_value == codeforces.CF_FILE_NOT_FOUND:
             messagebox.showerror("Error", "File is not found")
+
+        elif return_value == codeforces.CF_NOT_REGISTERED:
+            messagebox.showerror("Error", "You cannot submit, maybe you are not registered!")
 
         elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
             self.status_bar['text'] = "Okay submitted successfully!\nPlease Wait while Judging...\n"

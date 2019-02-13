@@ -2,6 +2,7 @@ import requests
 import time
 from termcolor import cprint
 
+CF_NOT_REGISTERED = 2
 CF_SUBMITTED_SUCCESSFULLY = 1
 CF_NOT_SUBMITTED_YET = 0
 CF_FILE_NOT_FOUND = -1
@@ -61,15 +62,14 @@ def login(browser, username, password):
     return True
 
 
-def submit_solution_to_problem(browser, solution_language, problem_id, filename):
+def submit_solution_to_problem(logged_in_browser, solution_language, problem_link, filename):
     """"This method tries to submit codeforces solution to a problem using file"""
 
-    cprint('Submitting [{1}] for problem [{0}] in [{2}]'.format(problem_id, filename, solution_language),
+    cprint('Submitting solution [{0}] in [{1}]'.format(filename, solution_language),
            color='green')
 
-    browser.open('https://codeforces.com/contest/' +
-                 problem_id[:-1] + '/problem/' + problem_id[-1])
-    submit_form = browser.get_form(class_='submitForm')
+    logged_in_browser.open(problem_link)
+    submit_form = logged_in_browser.get_form(class_='submitForm')
     # set the problem id to the first command line argument
 
     while True:
@@ -77,7 +77,9 @@ def submit_solution_to_problem(browser, solution_language, problem_id, filename)
             # set the solution language to the second argument
             submit_form['programTypeId'] = solution_language
             break  # if no error happens break, else retry
-        except Exception as e:
+        except TypeError:
+            return CF_NOT_REGISTERED
+        except Exception:
             cprint('No such language [{}]!'.format(
                 solution_language), color='red')
             cprint("Available languages are:", color='yellow')
@@ -94,19 +96,19 @@ def submit_solution_to_problem(browser, solution_language, problem_id, filename)
     try:
         # set the source code file to the name provided in cl argument
         submit_form['sourceFile'] = filename
-    except Exception as e:
+    except Exception:
         cprint('File {0} not found in current directory'.format(filename))
         return CF_FILE_NOT_FOUND
 
-    browser.submit_form(submit_form)  # submit the source code file
+    logged_in_browser.submit_form(submit_form)  # submit the source code file
 
-    if browser.url[-3:] != '/my':
-        cprint(
-            'Failed submission, probably you have submit the same file before', color='red')
-        return CF_ALREADY_SUBMITTED
+    if logged_in_browser.url.endswith(('status', 'my')):
+        cprint("Okay submitted successfully!", color="green")
+        return CF_SUBMITTED_SUCCESSFULLY
 
-    cprint("Okay submitted successfully!", color="green")
-    return CF_SUBMITTED_SUCCESSFULLY
+    cprint(
+        'Failed submission, probably you have submitted the same file before', color='red')
+    return CF_ALREADY_SUBMITTED
 
 
 def get_last_verdict_status_for_user(last_submit_id, username):
@@ -123,20 +125,22 @@ def get_last_verdict_status_for_user(last_submit_id, username):
                 # OK = ACCEPTED
                 last_status = 'ACCEPTED!\n' \
                               'OK - Passed {} tests\n' \
-                              '{} MS | {} KB'.format(
-                               passed_test_count_, time_, memory_)
+                              '{} MS | {} KB'.format(passed_test_count_, time_, memory_)
             else:
                 # NOT ACCEPTED
                 last_status = "{}!\n" \
                               "on test {}\n" \
-                              "{} MS | {} KB".format(
-                               verdict_, passed_test_count_ + 1, time_, memory_)
+                              "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
             yield last_status
             break
         elif verdict_ == 'TESTING' and (not has_started):
             last_status = "\nTesting...\n"
             has_started = True
+
         time.sleep(0.5)
-        yield last_status
         # hold on before making another request i.e.: (wait for a while till the judge finish testing)
+
+        yield last_status
+
+
