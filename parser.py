@@ -31,7 +31,6 @@ class Parser:
         # --- main GUI and size ---
         self.root = shared_tk
         self.root.title('CodeForces Problem Parser')
-        self.root.geometry('306x355+200+200')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
@@ -107,10 +106,22 @@ class Parser:
         self.test_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 1
 
+        # --- show output checkbox ---
+        self.should_show_output = BooleanVar()
+        self.show_output_checkbox = Checkbutton(self.main_frame, text="Show Output", variable=self.should_show_output)
+        self.show_output_checkbox.grid(row=row_counter, column=0, columnspan=2)
+        row_counter += 1
+
         # --- Submit button ---
         self.submit_button = Button(self.main_frame, text="Submit", font="Serif 14 bold",
                                     background='white', fg='black', command=self.codeforces_submit)
         self.submit_button.grid(row=row_counter, column=0, columnspan=2)
+        row_counter += 1
+
+        # --- Remove files button ---
+        self.remove_files_button = Button(self.main_frame, text="Remove Files", font="Serif 14 bold",
+                                          background='white', fg='black', command=self.remove_parsed_problem_files)
+        self.remove_files_button.grid(row=row_counter, column=0, columnspan=2)
         row_counter += 5
 
         # --- status bar ---
@@ -129,12 +140,15 @@ class Parser:
         by_kerolloz_bar.config(background='white', fg='black')
         row_counter += 1
 
+        self.root.geometry('{width}x{height}+{x}+{y}'.format(width=305, height=20+(row_counter*17), x=200, y=200))
+
         self.root.mainloop()
 
     def start_testing(self):
         """This function starts the command line tester"""
         self.start_progressbar()
-        command = 'python3 ' + os.getcwd() + '/' + self.directory_name + '/tester.py'
+        command = 'python3 {0}/{1}/tester.py {2}'.format(os.getcwd(), self.directory_name,
+                                                         str(self.should_show_output.get()))
         command_run = "x-terminal-emulator -e 'bash -c \"" + command + "\"'"
         os.system(command_run)
         self.reset_progressbar()
@@ -250,6 +264,7 @@ class Parser:
         self.submit_button.config(state=state)
         self.test_button.config(state=state)
         self.parse_button.config(state=state)
+        self.remove_files_button.config(state=state)
 
     def remove_parsed_problem_files(self):
         if self.directory_name:

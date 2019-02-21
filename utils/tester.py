@@ -20,22 +20,29 @@ def compiled_cpp_successfully():
     return os.system('g++ ' + current_directory + '/main.cpp -o ' + current_directory + '/a.out') == 0
 
 
-def run_solution_on_test(test_index):
-    os.system(
+def run_solution_on_test(test_index, show_output=False):
+    status_output = subprocess.getstatusoutput(
         current_directory + '/a.out < ' + current_directory + '/in' + test_index + '.txt > ' +
-        current_directory + '/my_out' + test_index + '.txt'
+        current_directory + '/my_out' + test_index + '.txt' +
+        "; cat " + current_directory + '/my_out' + test_index + '.txt'
     )
+    if show_output == "True":
+        print(
+            "----OUTPUT----\n" +
+            status_output[1] +
+            "\n--------------"
+        )
 
 
 def compare_outputs_of_test(test_index):
     # getstatusoutput returns a tuple, the first element is the exit status
     # if zero(no error), successful
-    compare_status = subprocess.getstatusoutput(
-            'diff -s -q -Z ' + current_directory + '/out' + test_index + '.txt ' + current_directory +
-            '/my_out' + test_index + '.txt'
-           )[0]
+    status_output = subprocess.getstatusoutput(
+        'diff -s -q -Z ' + current_directory + '/out' + test_index + '.txt ' + current_directory +
+        '/my_out' + test_index + '.txt'
+    )
 
-    return compare_status == 0
+    return status_output[0] == 0
 
 
 def quit_tester():
@@ -45,9 +52,11 @@ def quit_tester():
 
 
 if __name__ == '__main__':
-
     current_directory = get_current_directory()
     test_cases = get_number_of_test_cases_for(current_directory)
+
+    # if no show output argument is provided
+    should_show_output = sys.argv[1] if len(sys.argv) > 1 else False
 
     cprint('Compiling...', 'white', attrs=['dark'])
 
@@ -68,9 +77,9 @@ if __name__ == '__main__':
     for e in range(test_cases):
         test_number = str(e)
 
-        run_solution_on_test(test_number)
-
         cprint('Test Case {}:'.format(str(e + 1)), 'yellow')
+
+        run_solution_on_test(test_number, should_show_output)
 
         if compare_outputs_of_test(test_number):
             # 0 means Identical
