@@ -38,6 +38,12 @@ def compare_outputs_of_test(test_index):
     return compare_status == 0
 
 
+def quit_tester():
+    cprint('\nPress ENTER to exit...', end='', color='white')
+    input()
+    sys.exit()
+
+
 if __name__ == '__main__':
 
     current_directory = get_current_directory()
@@ -50,9 +56,7 @@ if __name__ == '__main__':
         cprint('Compiled successfully!\n', 'green', attrs=['bold'])
     else:
         cprint('Compilation ERROR\n\n' + "Please, Check Your code", 'red', attrs=['bold'])
-        cprint('\nPress ENTER to exit...', end='', color='white')
-        input()
-        sys.exit()
+        quit_tester()
         # stop and close the program
 
     is_accepted = True
