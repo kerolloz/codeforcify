@@ -182,10 +182,14 @@ class Parser:
 
         try:
             self.robo_browser.open(self.problem_link, timeout=10)
+            self.status_bar['text'] = "\nStatus: Opening problem link..\n"
+
         except Exception:
             self.reset_progressbar()
             messagebox.showerror('Connection TimeOut', 'Check your internet connection or the problem link')
             return
+
+        self.status_bar['text'] = "\nStatus: Preparing problem's files..\n"
 
         problem_number = re.findall(r"\d+", self.problem_link)[-1]  # get last match
         # the last letters form the link
@@ -202,6 +206,8 @@ class Parser:
         shutil.copyfile('utils/template.cpp', self.directory_name + '/main.cpp')
 
         os.chdir(self.directory_name)  # go to the problem folder
+
+        self.status_bar['text'] = "\nStatus: Extracting test cases..\n"
 
         my_html = str(self.robo_browser.select('pre')).replace(
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
@@ -233,6 +239,8 @@ class Parser:
 
         messagebox.showinfo(
             'CF Parser', 'Problem has been parsed Successfully!')
+
+        self.status_bar['text'] = "\nStatus: Ok\n"
 
         # open the code using the chosen editor
         os.system(
