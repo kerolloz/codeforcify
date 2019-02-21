@@ -187,7 +187,7 @@ class Parser:
             messagebox.showerror('Connection TimeOut', 'Check your internet connection or the problem link')
             return
 
-        problem_number = re.findall(r"\d+", self.problem_link)[0]  # get first match
+        problem_number = re.findall(r"\d+", self.problem_link)[-1]  # get last match
         # the last letters form the link
         self.directory_name = str(problem_number) + self.problem_link[-1:]
         self.directory_name = self.directory_name.replace('/', '')
