@@ -51,6 +51,7 @@ class Login:
             row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
         self.username_entry.config(background='white', fg='black')
         self.username_entry.bind("<Return>", self.codeforces_login)
+        self.username_entry.focus()
 
         # --- password label ---
         password_label = Label(
