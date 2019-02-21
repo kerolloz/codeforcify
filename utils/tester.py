@@ -69,7 +69,7 @@ if __name__ == '__main__':
         # stop and close the program
 
     if test_cases == 0:
-        cprint("No available test cases!", color="Red")
+        cprint("No available test cases!", color="red")
         quit_tester()
 
     is_accepted = True
