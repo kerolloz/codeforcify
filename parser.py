@@ -251,6 +251,7 @@ class Parser:
 
         self.reset_progressbar()
 
+        self.set_status_bar_to("\nStatus: Opening your editor\n")
         messagebox.showinfo(
             'CF Parser', 'Problem has been parsed Successfully!')
 
@@ -269,7 +270,7 @@ class Parser:
     def remove_parsed_problem_files(self):
         if self.directory_name:
             os.system("rm -r " + self.directory_name)
-            self.set_status_bar_to("Status: Problem Files\nare Deleted\nSuccessfully!")
+            self.set_status_bar_to("Status: Problem Files\nHave Been Deleted\nSuccessfully!")
         else:
             messagebox.showerror("Error", "You haven't parsed any problems yet!")
 
