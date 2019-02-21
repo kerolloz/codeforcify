@@ -251,6 +251,13 @@ class Parser:
         self.test_button.config(state=state)
         self.parse_button.config(state=state)
 
+    def remove_parsed_problem_files(self):
+        if self.directory_name:
+            os.system("rm -r " + self.directory_name)
+            self.status_bar['text'] = "Status: Problem Files\nare Deleted\nSuccessfully!"
+        else:
+            messagebox.showerror("Error", "You haven't parsed any problems yet!")
+
     def codeforces_submit(self):
         self.set_state_for_all_buttons(DISABLED)
         return_value = codeforces.CF_NOT_SUBMITTED_YET
