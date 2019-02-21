@@ -59,6 +59,10 @@ if __name__ == '__main__':
         quit_tester()
         # stop and close the program
 
+    if test_cases == 0:
+        cprint("No available test cases!", color="Red")
+        quit_tester()
+
     is_accepted = True
 
     for e in range(test_cases):
