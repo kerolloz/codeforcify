@@ -196,14 +196,14 @@ class Parser:
 
         try:
             self.robo_browser.open(self.problem_link, timeout=10)
-            self.status_bar['text'] = "\nStatus: Opening problem link..\n"
+            self.set_status_bar_to("\nStatus: Opening problem link..\n")
 
         except Exception:
             self.reset_progressbar()
             messagebox.showerror('Connection TimeOut', 'Check your internet connection or the problem link')
             return
 
-        self.status_bar['text'] = "\nStatus: Preparing problem's files..\n"
+        self.set_status_bar_to("\nStatus: Preparing problem's files..\n")
 
         problem_number = re.findall(r"\d+", self.problem_link)[-1]  # get last match
         # the last letters form the link
@@ -221,7 +221,7 @@ class Parser:
 
         os.chdir(self.directory_name)  # go to the problem folder
 
-        self.status_bar['text'] = "\nStatus: Extracting test cases..\n"
+        self.set_status_bar_to("\nStatus: Extracting test cases..\n")
 
         my_html = str(self.robo_browser.select('pre')).replace(
             '<br/>', '\n').replace('<br />', '\n').replace('<br>', '\n')
@@ -254,7 +254,7 @@ class Parser:
         messagebox.showinfo(
             'CF Parser', 'Problem has been parsed Successfully!')
 
-        self.status_bar['text'] = "\nStatus: Ok\n"
+        self.set_status_bar_to("\nStatus: Ok\n")
 
         # open the code using the chosen editor
         os.system(
@@ -269,7 +269,7 @@ class Parser:
     def remove_parsed_problem_files(self):
         if self.directory_name:
             os.system("rm -r " + self.directory_name)
-            self.status_bar['text'] = "Status: Problem Files\nare Deleted\nSuccessfully!"
+            self.set_status_bar_to("Status: Problem Files\nare Deleted\nSuccessfully!")
         else:
             messagebox.showerror("Error", "You haven't parsed any problems yet!")
 
@@ -278,16 +278,15 @@ class Parser:
         return_value = codeforces.CF_NOT_SUBMITTED_YET
         last_submit_id = None
         if self.problem_id:
-            self.status_bar['text'] = "\nStatus: getting last submission id\n"
-            self.root.update()
+            self.set_status_bar_to("\nStatus: getting last submission id\n")
             # returns a tuple (first element is the last submission id)
             last_submit_id = codeforces.get_latest_verdict(self.username)[0]
 
-            self.status_bar['text'] = 'Submitting [{1}]\nfor problem [{0}]\nin [{2}]' \
+            status = 'Submitting [{1}]\nfor problem [{0}]\nin [{2}]' \
                 .format(self.problem_id,
                         self.directory_name + '/main.cpp',
                         "GNU G++17 7.3.0")
-            self.root.update()
+            self.set_status_bar_to(status)
 
             return_value = codeforces.submit_solution_to_problem(self.robo_browser,
                                                                  'GNU G++17 7.3.0',
@@ -303,16 +302,19 @@ class Parser:
             messagebox.showerror("Error", "You cannot submit, maybe you are not registered!")
 
         elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
-            self.status_bar['text'] = "Okay submitted successfully!\nPlease Wait while Judging...\n"
-            self.root.update()
+            status = "Okay submitted successfully!\nPlease Wait while Judging...\n"
+            self.set_status_bar_to(status)
             for verdict in codeforces.get_last_verdict_status_for_user(last_submit_id, self.username):
-                self.status_bar['text'] = verdict
-                self.root.update()
+                self.set_status_bar_to(verdict)
 
             messagebox.showinfo("Verdict", verdict)
 
-        self.status_bar['text'] = "\nStatus: Ok\n"
+        self.set_status_bar_to("\nStatus: Ok\n")
         self.set_state_for_all_buttons(NORMAL)
+
+    def set_status_bar_to(self, status):
+        self.status_bar['text'] = status
+        self.root.update()
 
 
 # Helpful functions
