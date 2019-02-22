@@ -1,5 +1,5 @@
 import re
-import requests
+import codeforces
 import time
 from termcolor import cprint
 
@@ -17,25 +17,11 @@ def safe_get(dictionary, key):
     return None
 
 
-def get_latest_verdict(user):
+def get_latest_verdict(api_key, api_secret, user):
     """This method uses codeforces API to get the last submission verdict submitted by the user"""
-
-    r = requests.get('http://codeforces.com/api/user.status?'
-                     + 'handle={}&from=1&count=1'.format(user))
-    js = r.json()
-    if 'status' not in js or js['status'] != 'OK':
-        raise ConnectionError('Cannot connect to codeforces!')
-    try:
-        result = js['result'][0]
-        id_ = result['id']
-        # try to get the value of the verdict from the result json object
-        verdict_ = safe_get(result, 'verdict')
-        time_ = result['timeConsumedMillis']
-        memory_ = result['memoryConsumedBytes'] / 1000
-        passed_test_count_ = result['passedTestCount']
-    except Exception as e:
-        raise ConnectionError('Cannot get latest submission, error')
-    return id_, verdict_, time_, memory_, passed_test_count_
+    codeforces_api = codeforces.CodeforcesAPI(key=api_key, secret=api_secret)
+    last_submission: codeforces.Submission = list(codeforces_api.user_status(count=1, handle=user))[0]
+    return last_submission
 
 
 def login(browser, username, password):
@@ -112,14 +98,16 @@ def submit_solution_to_problem(logged_in_browser, solution_language, problem_lin
     return CF_ALREADY_SUBMITTED
 
 
-def get_last_verdict_status_for_user(last_submit_id, username):
+def get_last_verdict_status_for_user(last_submit_id, username, api_key, api_secret):
     """This method returns the user last submission verdict"""
     last_status = None
     has_started = False
     while True:
         # keep trying to get last submission verdict
-        id_, verdict_, time_, memory_, passed_test_count_ = get_latest_verdict(
-            username)
+        submission = get_latest_verdict(api_key, api_secret, username)
+        id_, verdict_, time_, memory_, passed_test_count_ = submission.id, submission.verdict.value, \
+                                                            submission.time_consumed, submission.memory_consumed, \
+                                                            submission.passed_test_count
         if id_ != last_submit_id and verdict_ != 'TESTING' and verdict_ is not None:
             # check if verdict is set to some value (Not TESTING)
             if verdict_ == 'OK':
@@ -139,7 +127,7 @@ def get_last_verdict_status_for_user(last_submit_id, username):
             last_status = "\nTesting...\n"
             has_started = True
 
-        time.sleep(0.5)
+        time.sleep(0.25)
         # hold on before making another request i.e.: (wait for a while till the judge finish testing)
 
         yield last_status

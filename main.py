@@ -11,4 +11,8 @@ if __name__ == '__main__':
     login_gui = login.Login(shared_gui, shared_browser)
 
     if login_gui.is_logged_in:
-        parser_gui = parser.Parser(shared_gui, shared_browser, login_gui.get_username())
+        parser_gui = parser.Parser(shared_gui,
+                                   shared_browser,
+                                   login_gui.get_username(),
+                                   login_gui.get_api_key(),
+                                   login_gui.get_api_secret())

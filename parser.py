@@ -2,7 +2,7 @@ import json
 import shutil
 import os
 import threading
-import codeforces
+import codeforces_wrapper
 
 from tkinter import *
 from tkinter import ttk
@@ -14,13 +14,15 @@ class Parser:
     directory_name = ''
     problem_id = 0
 
-    def __init__(self, shared_tk, logged_in_browser, username):
+    def __init__(self, shared_tk, logged_in_browser, username, api_key, api_secret):
         # --- variable for path adding restriction in case of parsing more than one problem
         # to avoid adding editors' paths again
         self.robo_browser = logged_in_browser
         self.first_problem = True
         self.username = username
         self.problem_link = None
+        self.api_key = api_key
+        self.api_secret = api_secret
 
         # Load the editors from editors.json
         data_file_path = os.path.join(os.path.dirname(
@@ -140,7 +142,7 @@ class Parser:
         by_kerolloz_bar.config(background='white', fg='black')
         row_counter += 1
 
-        self.root.geometry('{width}x{height}+{x}+{y}'.format(width=305, height=20+(row_counter*17), x=200, y=200))
+        self.root.geometry('{width}x{height}+{x}+{y}'.format(width=305, height=20 + (row_counter * 17), x=200, y=200))
 
         self.root.mainloop()
 
@@ -189,7 +191,7 @@ class Parser:
     def start_parsing(self):
         self.problem_link = str(self.problem_link_entry.get())
 
-        if not codeforces.is_a_valid_problem_link(self.problem_link):
+        if not codeforces_wrapper.is_a_valid_problem_link(self.problem_link):
             self.reset_progressbar()
             messagebox.showerror('Invalid link', 'This is NOT a valid codeforces problem link!')
             return
@@ -276,12 +278,12 @@ class Parser:
 
     def codeforces_submit(self):
         self.set_state_for_all_buttons(DISABLED)
-        return_value = codeforces.CF_NOT_SUBMITTED_YET
+        return_value = codeforces_wrapper.CF_NOT_SUBMITTED_YET
         last_submit_id = None
         if self.problem_id:
             self.set_status_bar_to("\nStatus: getting last submission id\n")
             # returns a tuple (first element is the last submission id)
-            last_submit_id = codeforces.get_latest_verdict(self.username)[0]
+            last_submit_id = codeforces_wrapper.get_latest_verdict(self.api_key, self.api_secret, self.username).id
 
             status = 'Submitting [{1}]\nfor problem [{0}]\nin [{2}]' \
                 .format(self.problem_id,
@@ -289,23 +291,24 @@ class Parser:
                         "GNU G++17 7.3.0")
             self.set_status_bar_to(status)
 
-            return_value = codeforces.submit_solution_to_problem(self.robo_browser,
-                                                                 'GNU G++17 7.3.0',
-                                                                 self.problem_link,
-                                                                 self.directory_name + '/main.cpp')
-        if return_value == codeforces.CF_ALREADY_SUBMITTED:
+            return_value = codeforces_wrapper.submit_solution_to_problem(self.robo_browser,
+                                                                         'GNU G++17 7.3.0',
+                                                                         self.problem_link,
+                                                                         self.directory_name + '/main.cpp')
+        if return_value == codeforces_wrapper.CF_ALREADY_SUBMITTED:
             messagebox.showerror("Error", "File is already submitted before")
 
-        elif return_value == codeforces.CF_FILE_NOT_FOUND:
+        elif return_value == codeforces_wrapper.CF_FILE_NOT_FOUND:
             messagebox.showerror("Error", "File is not found")
 
-        elif return_value == codeforces.CF_NOT_REGISTERED:
+        elif return_value == codeforces_wrapper.CF_NOT_REGISTERED:
             messagebox.showerror("Error", "You cannot submit, maybe you are not registered!")
 
-        elif return_value == codeforces.CF_SUBMITTED_SUCCESSFULLY:
+        elif return_value == codeforces_wrapper.CF_SUBMITTED_SUCCESSFULLY:
             status = "Okay submitted successfully!\nPlease Wait while Judging...\n"
             self.set_status_bar_to(status)
-            for verdict in codeforces.get_last_verdict_status_for_user(last_submit_id, self.username):
+            for verdict in codeforces_wrapper.get_last_verdict_status_for_user(last_submit_id, self.username,
+                                                                               self.api_key, self.api_secret):
                 self.set_status_bar_to(verdict)
 
             messagebox.showinfo("Verdict", verdict)
