@@ -68,7 +68,7 @@ class Parser:
         self.problem_link_entry.grid(
             row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
         self.problem_link_entry.config(background='white', fg='black')
-        self.problem_link_entry.bind('<Return>', self.parser)
+        self.problem_link_entry.bind("<Return>", self.parser)
         self.problem_link_entry.focus()
 
         # --- editor label ---
@@ -168,8 +168,9 @@ class Parser:
         threading.Thread(target=self.start_testing).start()
         self.reset_progressbar()
 
-    def parser(self):
-        """this function gets called when the Parse Button is clicked"""
+    def parser(self, event=None):
+        """This function gets called when the Parse Button is clicked or
+        Enter is pressed in the problem link entry"""
 
         main_thread = threading.Thread(target=self.start_parsing, args=())
         # start the threads to work simultaneously
