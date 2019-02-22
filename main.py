@@ -6,7 +6,7 @@ import parser
 if __name__ == '__main__':
 
     shared_gui = Tk()
-    shared_browser = RoboBrowser(parser='html.parser')
+    shared_browser = RoboBrowser(parser='html.parser', timeout=10)
 
     login_gui = login.Login(shared_gui, shared_browser)
 
