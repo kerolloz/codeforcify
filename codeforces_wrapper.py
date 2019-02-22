@@ -20,7 +20,7 @@ def safe_get(dictionary, key):
 def get_latest_verdict(api_key, api_secret, user):
     """This method uses codeforces API to get the last submission verdict submitted by the user"""
     codeforces_api = codeforces.CodeforcesAPI(key=api_key, secret=api_secret)
-    last_submission: codeforces.Submission = list(codeforces_api.user_status(count=1, handle=user))[0]
+    last_submission = list(codeforces_api.user_status(count=1, handle=user))[0]
     return last_submission
 
 
