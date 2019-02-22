@@ -96,6 +96,7 @@ class Login:
         self.api_secret_entry.grid(
             row=row_counter, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
         self.api_secret_entry.config(background='white', fg='black')
+        self.api_secret_entry.bind("<Return>", self.codeforces_login)
         row_counter += 2
 
         # --- login button ---
