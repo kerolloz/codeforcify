@@ -1,5 +1,5 @@
 import os
-import codeforces
+import codeforces_wrapper
 import unittest
 import parser
 from robobrowser import RoboBrowser
@@ -24,34 +24,34 @@ class CodeForcesTests(unittest.TestCase):
         _dict = {
             'existing_key': 1
         }
-        self.assertEqual(codeforces.safe_get(_dict, 'existing_key'), 1)
-        self.assertIsNone(codeforces.safe_get(_dict, 'non_existing_key'))
+        self.assertEqual(codeforces_wrapper.safe_get(_dict, 'existing_key'), 1)
+        self.assertIsNone(codeforces_wrapper.safe_get(_dict, 'non_existing_key'))
 
     def test_get_latest_verdict(self):
-        self.assertTrue(codeforces.get_latest_verdict("tourist"))
+        self.assertTrue(codeforces_wrapper.get_latest_verdict("tourist"))
         with self.assertRaises(ConnectionError):
-            codeforces.get_latest_verdict('_')
+            codeforces_wrapper.get_latest_verdict('_')
 
     def test_login(self):
-        self.assertTrue(codeforces.login(self.logged_in_browser, 'test-parser', 'parser'))
+        self.assertTrue(codeforces_wrapper.login(self.logged_in_browser, 'test-parser', 'parser'))
         browser = RoboBrowser(parser='html.parser')  # create a new logged out browser
-        self.assertFalse(codeforces.login(browser, '_', '_'))
+        self.assertFalse(codeforces_wrapper.login(browser, '_', '_'))
 
     def test_submit_solution_to_problem(self):
         self.setUp()
 
-        submission_status = codeforces.submit_solution_to_problem(self.logged_in_browser,
+        submission_status = codeforces_wrapper.submit_solution_to_problem(self.logged_in_browser,
                                                                   'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
                                                                   'main.cpp')
-        self.assertEqual(submission_status, codeforces.CF_SUBMITTED_SUCCESSFULLY)
+        self.assertEqual(submission_status, codeforces_wrapper.CF_SUBMITTED_SUCCESSFULLY)
 
-        submission_status = codeforces.submit_solution_to_problem(self.logged_in_browser,
+        submission_status = codeforces_wrapper.submit_solution_to_problem(self.logged_in_browser,
                                                                   'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
                                                                   'main.cpp')
-        self.assertEqual(submission_status, codeforces.CF_ALREADY_SUBMITTED)
+        self.assertEqual(submission_status, codeforces_wrapper.CF_ALREADY_SUBMITTED)
 
     def test_get_latest_verdict_is_accepted(self):
-        latest_verdict = codeforces.get_latest_verdict('test-parser')
+        latest_verdict = codeforces_wrapper.get_latest_verdict('test-parser')
         # returns id_, verdict_, time_, memory_, passed_test_count_
         self.assertEqual(
             latest_verdict[1], "OK"
