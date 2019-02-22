@@ -68,6 +68,7 @@ class Parser:
         self.problem_link_entry.grid(
             row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
         self.problem_link_entry.config(background='white', fg='black')
+        self.problem_link_entry.bind('<Return>', self.parser)
         self.problem_link_entry.focus()
 
         # --- editor label ---
