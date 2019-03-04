@@ -1,4 +1,4 @@
-# CodeForces Problem Parser  [![Build Status](https://travis-ci.com/kerolloz/cf-parser-linux.svg?token=cvKSoAjxeU9ixCtWSxnx&branch=master)](https://travis-ci.com/kerolloz/cf-parser-linux)
+# Codeforcify  [![Build Status](https://travis-ci.com/kerolloz/codeforcify.svg?token=cvKSoAjxeU9ixCtWSxnx&branch=master)](https://travis-ci.com/kerolloz/codeforcify)
 
 ![codeforces](codeforces-logo.png)
 <br>
@@ -6,8 +6,8 @@ Problem Solving Made **_Easy_**
 <br>
 _currently we support **c++** solutions only_
 
--   [Requirements Installation](https://github.com/kerolloz/cf-parser-linux#requirements-installation)
--   [Usage](https://github.com/kerolloz/cf-parser-linux#how-to-use)
+-   [Requirements Installation](https://github.com/kerolloz/codeforcify#requirements-installation)
+-   [Usage](https://github.com/kerolloz/codeforcify#how-to-use)
 
 # Requirements Installation
 
