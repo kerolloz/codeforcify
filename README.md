@@ -48,4 +48,4 @@ python3 main.py
 <b> &lt;/> with :heart: by _Kerolloz_<br> </b>
 <b>Made for Linux</b><br>
 
-<h3> version: 3.0
+<h3> version: 3.2
