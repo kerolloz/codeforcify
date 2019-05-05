@@ -20,18 +20,11 @@ def compiled_cpp_successfully():
     return os.system('g++ ' + current_directory + '/main.cpp -o ' + current_directory + '/a.out') == 0
 
 
-def run_solution_on_test(test_index, show_output=False):
-    status_output = subprocess.getstatusoutput(
+def run_solution_on_test(test_index):
+    subprocess.getstatusoutput(
         current_directory + '/a.out < ' + current_directory + '/in' + test_index + '.txt > ' +
-        current_directory + '/my_out' + test_index + '.txt' +
-        "; cat " + current_directory + '/my_out' + test_index + '.txt'
+        current_directory + '/my_out' + test_index + '.txt'
     )
-    if show_output == "True":
-        print(
-            "----OUTPUT----\n" +
-            status_output[1] +
-            "\n--------------"
-        )
 
 
 def compare_outputs_of_test(test_index):
@@ -42,7 +35,14 @@ def compare_outputs_of_test(test_index):
         '/my_out' + test_index + '.txt'
     )
 
-    return status_output[0] == 0
+    return status_output[0] == 0  # 0 means Identical
+
+
+def show_output(test_number):
+    with open(current_directory + '/my_out' + test_number + '.txt', 'r') as fin:
+        print('----OUTPUT----')
+        print(fin.read(), end='')
+        print('--------------')
 
 
 def quit_tester():
@@ -64,7 +64,8 @@ if __name__ == '__main__':
         os.system('clear')
         cprint('Compiled successfully!\n', 'green', attrs=['bold'])
     else:
-        cprint('Compilation ERROR\n\n' + "Please, Check Your code", 'red', attrs=['bold'])
+        cprint('Compilation ERROR\n\n' +
+               "Please, Check Your code", 'red', attrs=['bold'])
         quit_tester()
         # stop and close the program
 
@@ -77,16 +78,18 @@ if __name__ == '__main__':
     for e in range(test_cases):
         test_number = str(e)
 
-        cprint('Test Case {}:'.format(str(e + 1)), 'yellow')
+        cprint('Test Case {}:'.format(str(e + 1)), 'yellow', end='')
 
-        run_solution_on_test(test_number, should_show_output)
+        run_solution_on_test(test_number)
 
         if compare_outputs_of_test(test_number):
-            # 0 means Identical
             cprint(' Passed', 'green')
         else:
             is_accepted = False
             cprint(' Wrong Answer', 'red')
+
+        if should_show_output:
+            show_output(test_number)
 
     print()
 
