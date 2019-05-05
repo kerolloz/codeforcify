@@ -16,7 +16,7 @@ int main (){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     // come on, go SOLVE it..!!!
-    // save your code, then use tester.py to check the test cases
+    // save your code, then press test!
 
 
     return 0;
