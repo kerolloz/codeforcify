@@ -63,9 +63,9 @@ class Login:
 
         self.should_remember_me = tk.BooleanVar()
         ttk.Checkbutton(main_frame, text="Remember Me",
-                        variable=self.should_remember_me).pack()
+                        variable=self.should_remember_me).pack(pady=15)
 
-        self.login_button.pack(pady=30)
+        self.login_button.pack(pady=15)
 
         self.username_entry.focus()
 
