@@ -47,7 +47,7 @@ The parser will automatically login if there is any saved info.
 The parser will parse the input and output in the problem test cases.
 The parser will open a template with the editor you choose.
 The parser will test the solution on the sample inputs and outputs of the problem.
-The parser can test the solution on a given custom input. 
+The parser can test the solution on a given custom input.
 The parser will submit the solution of the problem and wait for the verdict.
 
 ---
