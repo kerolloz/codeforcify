@@ -58,37 +58,24 @@ def submit_solution_to_problem(logged_in_browser, solution_language, problem_lin
 
     logged_in_browser.open(problem_link)
     submit_form = logged_in_browser.get_form(class_='submitForm')
-    # set the problem id to the first command line argument
+   
+    try:
+        
+        submit_form['programTypeId'] = solution_language
+    except Exception as e:
+        cprint(e)
+        return CF_NOT_REGISTERED
 
-    while True:
-        try:
-            # set the solution language to the second argument
-            submit_form['programTypeId'] = solution_language
-            break  # if no error happens break, else retry
-        except TypeError:
-            return CF_NOT_REGISTERED
-        except Exception:
-            cprint('No such language [{}]!'.format(
-                solution_language), color='red')
-            cprint("Available languages are:", color='yellow')
-            options = submit_form['programTypeId'].options
-            labels = submit_form['programTypeId'].labels
-            languages_dictionary = dict(zip(options, labels))
-            for option, label in languages_dictionary.items():
-                print(
-                    "{number:2} -> {language}".format(number=option, language=label))
-            solution_language = languages_dictionary[input(
-                "Enter language number: ")]
-            cprint('You chose [{}]'.format(solution_language), color='green')
 
     try:
         # set the source code file to the name provided in cl argument
-        submit_form['sourceFile'] = filename
-    except Exception:
+        with open(filename, 'r') as source_code:
+            submit_form['sourceFile'].value = source_code
+            logged_in_browser.submit_form(submit_form)  # submit the source code file
+    except Exception as e:
+        cprint(e)
         cprint('File {0} not found in current directory'.format(filename))
         return CF_FILE_NOT_FOUND
-
-    logged_in_browser.submit_form(submit_form)  # submit the source code file
 
     if logged_in_browser.url.endswith(('status', 'my')):
         cprint("Okay submitted successfully!", color="green")
