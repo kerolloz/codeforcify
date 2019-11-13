@@ -14,7 +14,7 @@ _currently we support **c++** solutions only_
 You should have python3, python3-pip & python3-tk installed
 
 ```bash
-sudo apt-get install python3 python3-pip python3-tk
+sudo apt install python3 python3-pip python3-tk
 ```
 
 Then after cloning the repository,
