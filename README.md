@@ -25,9 +25,11 @@ pip3 install -r requirements.txt
 ## How to use
 
 1. Run the Parser from the terminal
-```bash
-python3 main.py
-```
+
+   ```bash
+   python3 main.py
+   ```
+
 1. Login to CodeForces. **NOTE:** API key & API secret are optional(helpful in case of private submissions).  
    ![screenshot](./screenShots/screen1.png)
 1. Copy and paste the problem link, choose an editor.  
@@ -40,7 +42,6 @@ python3 main.py
 ---
 
 > Give me the problem link, write your solution, I will do the rest for you...
-
 
 **</>** with :heart: by **Kerollos Magdy**  
 Made for **Linux** :penguin:
