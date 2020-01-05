@@ -78,7 +78,7 @@ class CodeForcesTests(unittest.TestCase):
                     if(n % 2 == 0 && n != 2) cout << "YES" << endl;
                     else cout << "NO" << endl;
                 }
-                //""" + uuid4().hex
+                //""" + uuid4().hex + uuid4().int
         with open('main.cpp', 'w') as ac_code:
             ac_code.write(accepted_code)
 

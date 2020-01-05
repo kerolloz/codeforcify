@@ -1,20 +1,21 @@
 import json
-import shutil
 import os
+import re
+import shutil
 import threading
-import codeforces_wrapper
+import tkinter as tk
+from tkinter import ttk, messagebox
 
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
 from bs4 import BeautifulSoup
+
+import codeforces_wrapper
 
 
 class Parser:
     directory_name = ''
     problem_id = 0
 
-    def __init__(self, shared_tk, logged_in_browser, username, api_key, api_secret):
+    def __init__(self, logged_in_browser, username, api_key, api_secret):
         # --- variable for path adding restriction in case of parsing more than one problem
         # to avoid adding editors' paths again
         self.robo_browser = logged_in_browser
@@ -31,119 +32,115 @@ class Parser:
             self.editor_run_command = json.load(file)
 
         # --- main GUI and size ---
-        self.root = shared_tk
+
+        self.root = tk.Tk()
         self.root.title('CodeForces Problem Parser')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
 
         # --- main Frame ---
-        self.main_frame = LabelFrame(
-            self.root, height=400, width=400, text="Parser", font="Serif")
-        self.main_frame.grid(row=0, column=0)
-        self.main_frame.config(background='white', fg='black')
+        self.main_frame = ttk.LabelFrame(self.root, text="Parser")
+        self.main_frame.pack()
+
+        style = ttk.Style()
+        style.configure("TLabel", background="white", padding=3)
+        style.configure("TLabelframe", background="white", padding=3)
+        style.configure("TLabelframe.Label", background="white")
+        style.configure("TEntry", padding=3)
 
         # --- CF image object ---
         current_file_path = os.path.dirname(os.path.realpath(__file__))
-        codeforces_image = PhotoImage(
+        codeforces_image = tk.PhotoImage(
             file=current_file_path + '/codeforces-logo.png')
 
         # --- CF image label ---
-        image_label = Label(self.main_frame)
+        image_label = ttk.Label(self.main_frame)
         image_label.config(image=codeforces_image)
-        image_label.grid(row=0, columnspan=2, rowspan=2, sticky='nsew')
-        image_label.config(background='white')
+        image_label.pack()
 
         # --- progress bar variable ---
-        self.progress = DoubleVar()
+        self.progress = tk.DoubleVar()
         self.progress.set(0.0)
 
         # --- problem link label ---
-        label1 = Label(self.main_frame, text="Problem Link: ",
-                       font="Serif 10 bold")
-        label1.grid(row=2, column=0, rowspan=2, sticky='sw')
-        label1.config(background='white', fg='black')
+        label1 = ttk.Label(self.main_frame, text="Problem Link: ")
+        label1.pack()
 
         # ---  Problem link entry ---
-        self.problem_link_entry = Entry(self.main_frame)
-        self.problem_link_entry.grid(
-            row=2, column=1, columnspan=2, sticky=("N", "S", "W", "E"))
-        self.problem_link_entry.config(background='white', fg='black')
+        self.problem_link_entry = ttk.Entry(self.main_frame)
+        self.problem_link_entry.pack()
+
         self.problem_link_entry.bind("<Return>", self.parser)
         self.problem_link_entry.focus()
 
         # --- editor label ---
-        label2 = Label(self.main_frame, text="Editor: ", font="Serif 10 bold")
-        label2.grid(row=4, column=0, rowspan=2, sticky='sw')
-        label2.config(background='white', fg='black')
+        label2 = ttk.Label(self.main_frame, text="Editor: ", )
+        label2.pack()
 
         # --- editors drop down menu ---
         row_counter = 5
 
-        self.editor_choice_name = StringVar()
+        self.editor_choice_name = tk.StringVar()
 
         self.editor_choice_name.set(list(self.editor_run_command.keys())[
                                         0])  # set the default option
 
-        drop_down_editors_menu = OptionMenu(
+        drop_down_editors_menu = ttk.OptionMenu(
             self.main_frame, self.editor_choice_name, *self.editor_run_command)
-        drop_down_editors_menu.grid(row=row_counter, column=1, rowspan=2)
+        drop_down_editors_menu.pack()
 
         row_counter += 2
 
         # --- progressbar ---
-        self.progressbar = ttk.Progressbar(self.main_frame, orient=HORIZONTAL, length=200, mode='indeterminate',
+        self.progressbar = ttk.Progressbar(self.main_frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
-        self.progressbar.grid(row=row_counter, column=0,
-                              columnspan=2, sticky=("N", "S", "W", "E"))
+        self.progressbar.pack()
         row_counter += 1
 
         # --- parse button ---
-        self.parse_button = Button(self.main_frame, text="Parse", font="Serif 14 bold",
-                                   background='white', fg='black', command=self.parser)
-        self.parse_button.grid(row=row_counter, column=0, columnspan=2)
+        self.parse_button = ttk.Button(self.main_frame, text="Parse",
+                                       command=self.parser)
+        self.parse_button.pack()
         row_counter += 1
 
         # --- Test button ---
-        self.test_button = Button(self.main_frame, text="Test", font="Serif 14 bold",
-                                  background='white', fg='black', command=self.tester)
-        self.test_button.grid(row=row_counter, column=0, columnspan=2)
+        self.test_button = ttk.Button(self.main_frame, text="Test",
+                                      command=self.tester)
+        self.test_button.pack()
         row_counter += 1
 
         # --- show output checkbox ---
-        self.should_show_output = BooleanVar()
-        self.show_output_checkbox = Checkbutton(self.main_frame, text="Show Output", variable=self.should_show_output)
-        self.show_output_checkbox.grid(row=row_counter, column=0, columnspan=2)
+        self.should_show_output = tk.BooleanVar()
+        self.show_output_checkbox = ttk.Checkbutton(self.main_frame, text="Show Output",
+                                                    variable=self.should_show_output)
+        self.show_output_checkbox.pack()
         row_counter += 1
 
         # --- Submit button ---
-        self.submit_button = Button(self.main_frame, text="Submit", font="Serif 14 bold",
-                                    background='white', fg='black', command=self.codeforces_submit)
-        self.submit_button.grid(row=row_counter, column=0, columnspan=2)
+        self.submit_button = ttk.Button(self.main_frame, text="Submit",
+                                        command=self.codeforces_submit)
+        self.submit_button.pack()
         row_counter += 1
 
         # --- Remove files button ---
-        self.remove_files_button = Button(self.main_frame, text="Remove Files", font="Serif 14 bold",
-                                          background='white', fg='black', command=self.remove_parsed_problem_files)
-        self.remove_files_button.grid(row=row_counter, column=0, columnspan=2)
+        self.remove_files_button = ttk.Button(self.main_frame, text="Remove Files",
+                                              command=self.remove_parsed_problem_files)
+        self.remove_files_button.pack()
         row_counter += 5
 
         # --- status bar ---
 
-        self.status_bar = Label(self.main_frame, text="\nStatus: Ok\n", font="Serif 10 bold")
-        self.status_bar.grid(row=row_counter, column=0, columnspan=2, sticky=("N", "S", "W", "E"))
-        self.status_bar.config(background='white', fg='black')
+        self.status_bar = ttk.Label(self.main_frame, text="\nStatus: Ok\n", )
+        self.status_bar.pack()
+
         row_counter += 5
 
         # --- by kerolloz ---
 
-        by_kerolloz_bar = Label(self.main_frame, text="by: Kerolloz", font="Serif 10 bold italic", bd=1, relief=SUNKEN,
-                                anchor=W)
-        by_kerolloz_bar.grid(row=row_counter, column=0,
-                             columnspan=2, sticky=("N", "S", "W", "E"))
-        by_kerolloz_bar.config(background='white', fg='black')
+        by_kerolloz_bar = ttk.Label(self.main_frame, text="by: Kerolloz", relief=tk.SUNKEN,
+                                    anchor=tk.W)
+        by_kerolloz_bar.pack()
         row_counter += 1
-
-        self.root.geometry('{width}x{height}+{x}+{y}'.format(width=305, height=20 + (row_counter * 17), x=200, y=200))
 
         self.root.mainloop()
 
@@ -157,10 +154,10 @@ class Parser:
         self.reset_progressbar()
 
     def tester(self):
-        """this function gets called when the Test Button is clicked"""
+        """this function gets called when the Test ttk.Button is clicked"""
 
         if self.directory_name == '':
-            messagebox.showerror(
+            tk.messagebox.showerror(
                 'Problem error', "You haven't parsed any problems yet")
             return
 
@@ -169,7 +166,7 @@ class Parser:
         self.reset_progressbar()
 
     def parser(self, event=None):
-        """This function gets called when the Parse Button is clicked or
+        """This function gets called when the Parse ttk.Button is clicked or
         Enter is pressed in the problem link entry"""
 
         main_thread = threading.Thread(target=self.start_parsing, args=())
@@ -178,7 +175,7 @@ class Parser:
         main_thread.start()
 
     def start_progressbar(self):
-        self.set_state_for_all_buttons(DISABLED)
+        self.set_state_for_all_buttons(tk.DISABLED)
         # create a thread for the progressbar, thread for the main program "parser"
         progress_speed = 8  # progressbar running speed
         progressbar_thread = threading.Thread(
@@ -188,7 +185,7 @@ class Parser:
     def reset_progressbar(self):
         self.progress.set(0.0)
         self.progressbar.stop()
-        self.set_state_for_all_buttons(NORMAL)
+        self.set_state_for_all_buttons(tk.NORMAL)
 
     def start_parsing(self):
         self.problem_link = str(self.problem_link_entry.get())
@@ -279,7 +276,7 @@ class Parser:
             messagebox.showerror("Error", "You haven't parsed any problems yet!")
 
     def codeforces_submit(self):
-        self.set_state_for_all_buttons(DISABLED)
+        self.set_state_for_all_buttons(tk.DISABLED)
         return_value = codeforces_wrapper.CF_NOT_SUBMITTED_YET
         last_submit_id = None
         if self.problem_id:
@@ -309,6 +306,7 @@ class Parser:
         elif return_value == codeforces_wrapper.CF_SUBMITTED_SUCCESSFULLY:
             status = "Okay submitted successfully!\nPlease Wait while Judging...\n"
             self.set_status_bar_to(status)
+            verdict = None
             for verdict in codeforces_wrapper.get_last_verdict_status_for_user(last_submit_id, self.username,
                                                                                self.api_key, self.api_secret):
                 self.set_status_bar_to(verdict)
@@ -316,7 +314,7 @@ class Parser:
             messagebox.showinfo("Verdict", verdict)
 
         self.set_status_bar_to("\nStatus: Ok\n")
-        self.set_state_for_all_buttons(NORMAL)
+        self.set_state_for_all_buttons(tk.NORMAL)
 
     def set_status_bar_to(self, status):
         self.status_bar['text'] = status
@@ -329,6 +327,6 @@ def group(lst, n):
     return zip(*[lst[i::n] for i in range(n)])
 
 
-def get_tags_contents(html_souped, tag_name, class_name=None):
+def get_tags_contents(souped_html, tag_name, class_name=None):
     """This function returns all the tags contents in a souped html"""
-    return [tag.contents for tag in html_souped.find_all(tag_name, class_name)]
+    return [tag.contents for tag in souped_html.find_all(tag_name, class_name)]

@@ -1,6 +1,7 @@
 import os
-import sys
 import subprocess
+import sys
+
 from termcolor import cprint
 
 

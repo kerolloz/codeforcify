@@ -1,6 +1,7 @@
 import re
-import codeforces
 import time
+
+import codeforces
 from termcolor import cprint
 
 CF_NOT_REGISTERED = 2
