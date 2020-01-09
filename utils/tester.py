@@ -21,25 +21,22 @@ def get_current_directory():
 
 def compile_solution():
     # returned 0 = successful
-    return os.system('make {}/main'.format(current_directory))
+    # use call method because it will output to stderr if compilation was not successfull
+    return subprocess.call('make {}/main'.format(current_directory), shell=True, stdout=subprocess.DEVNULL)
 
 
 def run_solution_on_test(test_num):
-    command = '{current_directory}/main < {current_directory}/in{test_num} > {current_directory}/my_out{test_num}'.format(
-        current_directory=current_directory, test_num=test_num)
-
-    subprocess.getstatusoutput(command)
+    command = '{0}/main < {0}/in{1} > {0}/my_out{1}'.format(
+        current_directory, test_num)
+    return subprocess.getstatusoutput(command)[0]
 
 
 def compare_outputs_of_test(test_num):
     # getstatusoutput returns a tuple, the first element is the exit status
     # if zero(no error), successful
-    command = 'diff -s -q -Z {current_directory}/out{test_num} {current_directory}/my_out{test_num}'.format(
-        current_directory=current_directory, test_num=test_num)
-
-    status_output = subprocess.getstatusoutput(command)
-
-    return status_output[0]
+    command = 'diff -s -q -Z {0}/out{1} {0}/my_out{1}'.format(
+        current_directory, test_num)
+    return subprocess.getstatusoutput(command)[0]
 
 
 def show_output(test_num):
@@ -61,14 +58,14 @@ if __name__ == '__main__':
     # if no show output argument is provided
     should_show_output = sys.argv[1] if len(sys.argv) > 1 else False
 
-    cprint('Compiling...', 'white', attrs=['dark'])
+    cprint('Compiling...\n', 'white', attrs=['dark'])
 
     if compile_solution() is COMPILED_SUCCESSFULLY:
         os.system('clear')
         cprint('Compiled successfully!\n', 'green', attrs=['bold'])
     else:
-        cprint('Compilation ERROR\n\n' +
-               "Please, Check Your code", 'red', attrs=['bold'])
+        cprint('\n\nCompilation ERROR!\n' +
+               "Please, Check your code!", 'red', attrs=['bold'])
         quit_tester()
         # stop and close the program
 
