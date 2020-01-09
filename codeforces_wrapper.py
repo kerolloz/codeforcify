@@ -32,7 +32,7 @@ def login(browser, user_data: dict):
     browser.open('http://codeforces.com/enter')
     enter_form = browser.get_form('enterForm')  # get login form object
     # set username in form to the username
-    enter_form['handleOrEmail'] = user_data['username']
+    enter_form['handleOrEmail'] = username = user_data['username']
     enter_form['password'] = user_data['password']  # same for password
     cprint("Logging in!", color='yellow')
     # submit the login form with the added info for user and password
