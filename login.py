@@ -8,13 +8,12 @@ import codeforces_wrapper
 
 def format_key(key: str):
     """Makes string lowercase and replaces spaces with underscores
-    for example
     >>> format_key("Username")
     'username'
     >>> format_key("Api key")
     'api_key'
     """
-    return "_".join(key.lower().split())
+    return key.lower().replace(' ', "_")
 
 
 class Login:
@@ -36,7 +35,8 @@ class Login:
         main_frame = ttk.LabelFrame(self.root, text="Login")
 
         current_file_path = os.path.dirname(os.path.realpath(__file__))
-        codeforces_image = tk.PhotoImage(file=current_file_path + '/codeforces-logo.png')
+        codeforces_image = tk.PhotoImage(
+            file=current_file_path + '/codeforces-logo.png')
 
         image_label = ttk.Label(main_frame)
         image_label.config(image=codeforces_image)
@@ -52,7 +52,8 @@ class Login:
             main_frame, text="Login", command=self.codeforces_login)
 
         self.labels = ["Username", "Password", "API Key", "API Secret"]
-        self.entries = [self.username_entry, self.password_entry, self.api_key_entry, self.api_secret_entry]
+        self.entries = [self.username_entry, self.password_entry,
+                        self.api_key_entry, self.api_secret_entry]
 
         for i in range(len(self.labels)):
             ttk.Label(main_frame, text=self.labels[i]).pack()
@@ -60,15 +61,15 @@ class Login:
             self.entries[i].bind("<Return>", self.codeforces_login)
 
         self.should_remember_me = tk.BooleanVar()
-        ttk.Checkbutton(main_frame, text="Remember Me", variable=self.should_remember_me).pack()
+        ttk.Checkbutton(main_frame, text="Remember Me",
+                        variable=self.should_remember_me).pack()
 
         self.login_button.pack(pady=30)
 
         self.username_entry.focus()
 
-        by_kerolloz_bar = ttk.Label(
-            main_frame, text="by: Kerolloz", relief=tk.SUNKEN)
-        by_kerolloz_bar.pack(expand=1, fill="both")
+        ttk.Label(
+            main_frame, text="by: Kerolloz", relief=tk.SUNKEN).pack(expand=1, fill="both")
 
         self.load_user_data_from_file()
         self.root.mainloop()
@@ -106,7 +107,6 @@ class Login:
         if self.should_remember_me.get():
             self.save_user_data_to_file()
         if codeforces_wrapper.login(self.robo_browser, self.user_data):
-            tk.messagebox.showinfo("Success", "Logged in successfully")
             self.root.destroy()  # destroy the login window
         else:
             self.login_button.config(text="Login", state=tk.NORMAL)
