@@ -4,64 +4,66 @@ import sys
 
 from termcolor import cprint
 
+COMPILED_SUCCESSFULLY = 0
+IDENTICAL = 0
 
-def get_number_of_test_cases_for(current_dir):
+
+def get_number_of_test_cases():
     # must include current_dir because running it from the parser will raise no file
-    with open(current_dir + '/test_cases.txt', 'r') as number_of_tests_file:
+    with open(current_directory + '/test_cases', 'r') as number_of_tests_file:
         number_of_test_cases = int(number_of_tests_file.read())
     return number_of_test_cases
 
 
 def get_current_directory():
-    return str(os.path.dirname(os.path.realpath(__file__)))
+    return os.path.dirname(os.path.realpath(__file__))
 
 
-def compiled_cpp_successfully():
+def compile_solution():
     # returned 0 = successful
-    return os.system('g++ ' + current_directory + '/main.cpp -o ' + current_directory + '/a.out') == 0
+    return os.system('make {}/main'.format(current_directory))
 
 
-def run_solution_on_test(test_index):
-    subprocess.getstatusoutput(
-        current_directory + '/a.out < ' + current_directory + '/in' + test_index + '.txt > ' +
-        current_directory + '/my_out' + test_index + '.txt'
-    )
+def run_solution_on_test(test_num):
+    command = '{current_directory}/main < {current_directory}/in{test_num} > {current_directory}/my_out{test_num}'.format(
+        current_directory=current_directory, test_num=test_num)
+
+    subprocess.getstatusoutput(command)
 
 
-def compare_outputs_of_test(test_index):
+def compare_outputs_of_test(test_num):
     # getstatusoutput returns a tuple, the first element is the exit status
     # if zero(no error), successful
-    status_output = subprocess.getstatusoutput(
-        'diff -s -q -Z ' + current_directory + '/out' + test_index + '.txt ' + current_directory +
-        '/my_out' + test_index + '.txt'
-    )
+    command = 'diff -s -q -Z {current_directory}/out{test_num} {current_directory}/my_out{test_num}'.format(
+        current_directory=current_directory, test_num=test_num)
 
-    return status_output[0] == 0  # 0 means Identical
+    status_output = subprocess.getstatusoutput(command)
+
+    return status_output[0]
 
 
-def show_output(test_number):
-    with open(current_directory + '/my_out' + test_number + '.txt', 'r') as fin:
+def show_output(test_num):
+    with open('%s/my_out%s' % (current_directory, test_num), 'r') as fin:
         print('----OUTPUT----')
         print(fin.read(), end='')
         print('--------------')
 
 
 def quit_tester():
-    cprint('\nPress ENTER to exit...', end='', color='white')
-    input()
+    input('\nPress ENTER to exit...')
     sys.exit()
 
 
 if __name__ == '__main__':
     current_directory = get_current_directory()
-    test_cases = get_number_of_test_cases_for(current_directory)
+    test_cases = get_number_of_test_cases()
 
     # if no show output argument is provided
     should_show_output = sys.argv[1] if len(sys.argv) > 1 else False
 
     cprint('Compiling...', 'white', attrs=['dark'])
 
-    if compiled_cpp_successfully():
+    if compile_solution() is COMPILED_SUCCESSFULLY:
         os.system('clear')
         cprint('Compiled successfully!\n', 'green', attrs=['bold'])
     else:
@@ -77,20 +79,20 @@ if __name__ == '__main__':
     is_accepted = True
 
     for e in range(test_cases):
-        test_number = str(e)
+        test_num = str(e)
 
-        cprint('Test Case {}:'.format(str(e + 1)), 'yellow', end='')
+        cprint('Test Case %d:' % (e+1), 'yellow', end='')
 
-        run_solution_on_test(test_number)
+        run_solution_on_test(test_num)
 
-        if compare_outputs_of_test(test_number):
+        if compare_outputs_of_test(test_num) is IDENTICAL:
             cprint(' Passed', 'green')
         else:
             is_accepted = False
             cprint(' Wrong Answer', 'red')
 
         if should_show_output:
-            show_output(test_number)
+            show_output(test_num)
 
     print()
 

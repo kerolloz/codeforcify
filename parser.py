@@ -222,15 +222,15 @@ class Parser:
 
         index = 0
         for test in test_cases:
-            with open('in' + str(index) + '.txt', 'w') as in_file:
+            with open('in' + str(index), 'w') as in_file:
                 input_content = ''.join(test[0]).strip()
                 in_file.write(input_content)
-            with open('out' + str(index) + '.txt', 'w') as out_file:
+            with open('out' + str(index), 'w') as out_file:
                 output = ''.join(test[1]).strip()
                 out_file.write(output)
             index += 1
 
-        with open('test_cases.txt', 'w') as f:
+        with open('test_cases', 'w') as f:
             f.write(str(index))
 
         os.chdir('..')  # go to the previous directory "parse.py" directory
