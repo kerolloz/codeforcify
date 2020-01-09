@@ -25,15 +25,15 @@ def get_latest_verdict(api_key, api_secret, user):
     return last_submission
 
 
-def login(browser, username, password):
+def login(browser, user_data: dict):
     """This method tries to login into codeforces account using RoboBrowser"""
 
     cprint("Opening login page", color='yellow')
     browser.open('http://codeforces.com/enter')
     enter_form = browser.get_form('enterForm')  # get login form object
-    # set username in form to the username preset in utils.config
-    enter_form['handleOrEmail'] = username
-    enter_form['password'] = password  # same for password
+    # set username in form to the username
+    enter_form['handleOrEmail'] = user_data['username']
+    enter_form['password'] = user_data['password']  # same for password
     cprint("Logging in!", color='yellow')
     # submit the login form with the added info for user and password
     browser.submit_form(enter_form)
@@ -115,12 +115,14 @@ def get_last_verdict_status_for_user(last_submit_id, username, api_key, api_secr
                 # OK = ACCEPTED
                 last_status = 'ACCEPTED!\n' \
                               'OK - Passed {} tests\n' \
-                              '{} MS | {} KB'.format(passed_test_count_, time_, memory_)
+                              '{} MS | {} KB'.format(
+                    passed_test_count_, time_, memory_)
             else:
                 # NOT ACCEPTED
                 last_status = "{}!\n" \
                               "on test {}\n" \
-                              "{} MS | {} KB".format(verdict_, passed_test_count_ + 1, time_, memory_)
+                              "{} MS | {} KB".format(
+                    verdict_, passed_test_count_ + 1, time_, memory_)
             # Print submission details
             yield last_status
             break

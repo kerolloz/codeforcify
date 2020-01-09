@@ -15,15 +15,14 @@ class Parser:
     directory_name = ''
     problem_id = 0
 
-    def __init__(self, logged_in_browser, username, api_key, api_secret):
+    def __init__(self, logged_in_browser, user_data: dict):
         # --- variable for path adding restriction in case of parsing more than one problem
         # to avoid adding editors' paths again
         self.robo_browser = logged_in_browser
-        self.first_problem = True
-        self.username = username
         self.problem_link = None
-        self.api_key = api_key
-        self.api_secret = api_secret
+        self.username = user_data['username']
+        self.api_key = user_data['api_key']
+        self.api_secret = user_data['api_secret']
 
         # Load the editors from editors.json
         data_file_path = os.path.join(os.path.dirname(
@@ -74,73 +73,59 @@ class Parser:
         self.problem_link_entry.focus()
 
         # --- editor label ---
-        label2 = ttk.Label(self.main_frame, text="Editor: ", )
-        label2.pack()
+        ttk.Label(self.main_frame, text="Editor: ", ).pack()
 
         # --- editors drop down menu ---
-        row_counter = 5
 
         self.editor_choice_name = tk.StringVar()
 
         self.editor_choice_name.set(list(self.editor_run_command.keys())[
                                         0])  # set the default option
 
-        drop_down_editors_menu = ttk.OptionMenu(
-            self.main_frame, self.editor_choice_name, *self.editor_run_command)
-        drop_down_editors_menu.pack()
-
-        row_counter += 2
+        # --- Drop down editors menu 
+        ttk.OptionMenu(self.main_frame, self.editor_choice_name, *self.editor_run_command).pack()
 
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
         self.progressbar.pack()
-        row_counter += 1
 
         # --- parse button ---
         self.parse_button = ttk.Button(self.main_frame, text="Parse",
                                        command=self.parser)
         self.parse_button.pack()
-        row_counter += 1
 
         # --- Test button ---
         self.test_button = ttk.Button(self.main_frame, text="Test",
                                       command=self.tester)
         self.test_button.pack()
-        row_counter += 1
 
         # --- show output checkbox ---
         self.should_show_output = tk.BooleanVar()
         self.show_output_checkbox = ttk.Checkbutton(self.main_frame, text="Show Output",
                                                     variable=self.should_show_output)
         self.show_output_checkbox.pack()
-        row_counter += 1
 
         # --- Submit button ---
         self.submit_button = ttk.Button(self.main_frame, text="Submit",
                                         command=self.codeforces_submit)
         self.submit_button.pack()
-        row_counter += 1
 
         # --- Remove files button ---
         self.remove_files_button = ttk.Button(self.main_frame, text="Remove Files",
                                               command=self.remove_parsed_problem_files)
         self.remove_files_button.pack()
-        row_counter += 5
 
         # --- status bar ---
 
         self.status_bar = ttk.Label(self.main_frame, text="\nStatus: Ok\n", )
         self.status_bar.pack()
 
-        row_counter += 5
-
         # --- by kerolloz ---
 
         by_kerolloz_bar = ttk.Label(self.main_frame, text="by: Kerolloz", relief=tk.SUNKEN,
                                     anchor=tk.W)
         by_kerolloz_bar.pack()
-        row_counter += 1
 
         self.root.mainloop()
 

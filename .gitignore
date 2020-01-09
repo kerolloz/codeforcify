@@ -2,4 +2,4 @@
 [0-9]*/
 lem[0-9]/
 __pycache__/
-__pycache__/*
+.user_data.json
