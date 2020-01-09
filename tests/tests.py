@@ -1,10 +1,12 @@
 import os
-import codeforces_wrapper
 import unittest
-import parser
-from robobrowser import RoboBrowser
-from bs4 import BeautifulSoup
 from uuid import uuid4
+
+from bs4 import BeautifulSoup
+from robobrowser import RoboBrowser
+
+import codeforces_wrapper
+import parser
 
 
 class ParserTests(unittest.TestCase):
@@ -37,22 +39,22 @@ class CodeForcesTests(unittest.TestCase):
 
     def test_login(self):
         self.assertTrue(codeforces_wrapper.login(
-            self.logged_in_browser, 'test-parser', 'parser'))
+            self.logged_in_browser, {'username': 'test-parser', 'password': 'parser'}))
         # create a new logged out browser
         browser = RoboBrowser(parser='html.parser')
-        self.assertFalse(codeforces_wrapper.login(browser, '_', '_'))
+        self.assertFalse(codeforces_wrapper.login(browser, {'username': 'fake', 'password': 'fake'}))
 
     def test_submit_solution_to_problem(self):
         self.setUp()
-
+        problem_link = 'https://codeforces.com/problemset/problem/4/A'
         submission_status = codeforces_wrapper.submit_solution_to_problem(self.logged_in_browser,
-                                                                          'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
+                                                                          'GNU G++17 7.3.0', problem_link,
                                                                           'main.cpp')
         self.assertEqual(submission_status,
                          codeforces_wrapper.CF_SUBMITTED_SUCCESSFULLY)
 
         submission_status = codeforces_wrapper.submit_solution_to_problem(self.logged_in_browser,
-                                                                          'GNU G++17 7.3.0', 'https://codeforces.com/problemset/problem/4/A',
+                                                                          'GNU G++17 7.3.0', problem_link,
                                                                           'main.cpp')
         self.assertEqual(submission_status,
                          codeforces_wrapper.CF_ALREADY_SUBMITTED)

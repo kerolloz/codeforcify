@@ -1,9 +1,11 @@
 language: python
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
+  - "python"
 install:
   - pip install -r requirements.txt
-script: python3 -m unittest tests/tests.py
+script:
+  - python3 -m unittest tests/tests.py
+  - python3 -m doctest login.py

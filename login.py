@@ -6,6 +6,17 @@ from tkinter import ttk, messagebox
 import codeforces_wrapper
 
 
+def format_key(key: str):
+    """Makes string lowercase and replaces spaces with underscores
+    for example
+    >>> format_key("Username")
+    'username'
+    >>> format_key("Api key")
+    'api_key'
+    """
+    return "_".join(key.lower().split())
+
+
 class Login:
 
     def __init__(self, shared_browser):
@@ -65,7 +76,7 @@ class Login:
     def user_data_to_dictionary(self):
         d = {}
         for i in range(len(self.labels)):
-            key = "_".join(self.labels[i].lower().split())  # to lower case && space to _
+            key = format_key(self.labels[i])
             d[key] = self.entries[i].get()
         return d
 
