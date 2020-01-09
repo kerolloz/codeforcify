@@ -84,15 +84,17 @@ class Login:
         with open('.user_data.json', 'w') as f:
             json.dump(self.user_data, f)
 
+    def load_user_data_to_ui(self):
+        for i in range(len(self.labels)):
+            key = format_key(self.labels[i])
+            self.entries[i].insert(0, self.user_data[key])
+
     def load_user_data_from_file(self):
         if os.path.exists(".user_data.json"):
             try:
                 with open('.user_data.json') as f:
                     self.user_data = json.load(f)
-                    self.username_entry.insert(0, self.user_data['username'])
-                    self.password_entry.insert(0, self.user_data['password'])
-                    self.api_key_entry.insert(0, self.user_data['api_key'])
-                    self.api_secret_entry.insert(0, self.user_data['api_secret'])
+                    self.load_user_data_to_ui()
                     self.codeforces_login()
             except FileNotFoundError:
                 print("No previous saved login user data")
