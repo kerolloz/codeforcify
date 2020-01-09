@@ -42,7 +42,8 @@ class CodeForcesTests(unittest.TestCase):
             self.logged_in_browser, {'username': 'test-parser', 'password': 'parser'}))
         # create a new logged out browser
         browser = RoboBrowser(parser='html.parser')
-        self.assertFalse(codeforces_wrapper.login(browser, {'username': 'fake', 'password': 'fake'}))
+        self.assertFalse(codeforces_wrapper.login(
+            browser, {'username': 'fake', 'password': 'fake'}))
 
     def test_submit_solution_to_problem(self):
         self.setUp()

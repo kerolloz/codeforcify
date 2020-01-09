@@ -78,7 +78,7 @@ if __name__ == '__main__':
     for e in range(test_cases):
         test_num = str(e)
 
-        cprint('Test Case %d:' % (e+1), 'yellow', end='')
+        cprint('Test Case %d:' % (e + 1), 'yellow', end='')
 
         run_solution_on_test(test_num)
 
