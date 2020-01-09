@@ -30,7 +30,8 @@ pip3 install -r requirements.txt
    python3 main.py
    ```
 
-1. Login to CodeForces. **NOTE:** API key & API secret are optional(helpful in case of private submissions).  
+1. Login to CodeForces.  
+   **NOTE:** API key & API secret are optional(helpful in case of private submissions).  
    ![screenshot](./screenShots/screen1.png)
 1. Copy and paste the problem link, choose an editor.  
    ![screenshot](./screenShots/screen2.png)
