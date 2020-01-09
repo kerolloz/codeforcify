@@ -31,6 +31,7 @@ class Login:
         style.configure("TLabelframe", background="white", padding=3)
         style.configure("TLabelframe.Label", background="white")
         style.configure("TEntry", padding=3)
+        style.configure("TButton", background="white")
 
         main_frame = ttk.LabelFrame(self.root, text="Login")
 

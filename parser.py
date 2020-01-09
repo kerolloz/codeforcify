@@ -2,6 +2,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -12,45 +13,42 @@ import codeforces_wrapper
 
 
 class Parser:
-    directory_name = ''
-    problem_id = 0
 
     def __init__(self, logged_in_browser, user_data: dict):
-        # --- variable for path adding restriction in case of parsing more than one problem
-        # to avoid adding editors' paths again
+        self.directory_name = ''
+        self.problem_id = 0
         self.robo_browser = logged_in_browser
         self.problem_link = None
-        self.username = user_data['username']
-        self.api_key = user_data['api_key']
-        self.api_secret = user_data['api_secret']
+        self.username, _, self.api_key, self.api_secret = user_data
+
+        self.current_file_path = os.path.dirname(os.path.realpath(__file__))
 
         # Load the editors from editors.json
-        data_file_path = os.path.join(os.path.dirname(
-            os.path.realpath(__file__)), "editors.json")
+        data_file_path = os.path.join(self.current_file_path, "editors.json")
         with open(data_file_path, "r", encoding="utf-8") as file:
             self.editor_run_command = json.load(file)
 
-        # --- main GUI and size ---
-
+        # --- main GUI and styling ---
         self.root = tk.Tk()
         self.root.title('CodeForces Problem Parser')
         self.root.resizable(False, False)
         # self.root.iconbitmap('app_icon.ico')  # window icon
-
-        # --- main Frame ---
-        self.main_frame = ttk.LabelFrame(self.root, text="Parser")
-        self.main_frame.pack()
 
         style = ttk.Style()
         style.configure("TLabel", background="white", padding=3)
         style.configure("TLabelframe", background="white", padding=3)
         style.configure("TLabelframe.Label", background="white")
         style.configure("TEntry", padding=3)
+        style.configure("TButton", background="white")
+
+        # --- main Frame ---
+        self.main_frame = ttk.LabelFrame(self.root, text="Parser")
+        self.main_frame.pack()
 
         # --- CF image object ---
-        current_file_path = os.path.dirname(os.path.realpath(__file__))
+
         codeforces_image = tk.PhotoImage(
-            file=current_file_path + '/codeforces-logo.png')
+            file=self.current_file_path + '/codeforces-logo.png')
 
         # --- CF image label ---
         image_label = ttk.Label(self.main_frame)
@@ -62,18 +60,17 @@ class Parser:
         self.progress.set(0.0)
 
         # --- problem link label ---
-        label1 = ttk.Label(self.main_frame, text="Problem Link: ")
-        label1.pack()
+        ttk.Label(self.main_frame, text="Problem Link").pack()
 
         # ---  Problem link entry ---
         self.problem_link_entry = ttk.Entry(self.main_frame)
-        self.problem_link_entry.pack()
+        self.problem_link_entry.pack(pady=5)
 
-        self.problem_link_entry.bind("<Return>", self.parser)
+        self.problem_link_entry.bind("<Return>", lambda x: self.parse())
         self.problem_link_entry.focus()
 
         # --- editor label ---
-        ttk.Label(self.main_frame, text="Editor: ", ).pack()
+        ttk.Label(self.main_frame, text="Editor").pack()
 
         # --- editors drop down menu ---
 
@@ -83,59 +80,58 @@ class Parser:
                                         0])  # set the default option
 
         # --- Drop down editors menu 
-        ttk.OptionMenu(self.main_frame, self.editor_choice_name, *self.editor_run_command).pack()
+        ttk.OptionMenu(self.main_frame, self.editor_choice_name, *self.editor_run_command).pack(pady=5)
 
         # --- progressbar ---
         self.progressbar = ttk.Progressbar(self.main_frame, orient=tk.HORIZONTAL, length=200, mode='indeterminate',
                                            maximum=100, variable=self.progress)
-        self.progressbar.pack()
+        self.progressbar.pack(expand=1, fill="both", pady=5)
 
         # --- parse button ---
         self.parse_button = ttk.Button(self.main_frame, text="Parse",
-                                       command=self.parser)
-        self.parse_button.pack()
+                                       command=self.parse)
+        self.parse_button.pack(pady=5)
 
         # --- Test button ---
         self.test_button = ttk.Button(self.main_frame, text="Test",
                                       command=self.tester)
-        self.test_button.pack()
+        self.test_button.pack(pady=5)
 
         # --- show output checkbox ---
         self.should_show_output = tk.BooleanVar()
         self.show_output_checkbox = ttk.Checkbutton(self.main_frame, text="Show Output",
                                                     variable=self.should_show_output)
-        self.show_output_checkbox.pack()
+        self.show_output_checkbox.pack(pady=5)
 
         # --- Submit button ---
         self.submit_button = ttk.Button(self.main_frame, text="Submit",
-                                        command=self.codeforces_submit)
-        self.submit_button.pack()
+                                        command=self.submit)
+        self.submit_button.pack(pady=5)
 
         # --- Remove files button ---
         self.remove_files_button = ttk.Button(self.main_frame, text="Remove Files",
                                               command=self.remove_parsed_problem_files)
-        self.remove_files_button.pack()
+        self.remove_files_button.pack(pady=5)
 
         # --- status bar ---
 
         self.status_bar = ttk.Label(self.main_frame, text="\nStatus: Ok\n", )
-        self.status_bar.pack()
+        self.status_bar.pack(pady=5)
 
         # --- by kerolloz ---
-
-        by_kerolloz_bar = ttk.Label(self.main_frame, text="by: Kerolloz", relief=tk.SUNKEN,
-                                    anchor=tk.W)
-        by_kerolloz_bar.pack()
+        ttk.Label(
+            self.main_frame, text="by: Kerolloz", relief=tk.SUNKEN).pack(expand=1, fill="both")
 
         self.root.mainloop()
 
     def start_testing(self):
         """This function starts the command line tester"""
         self.start_progressbar()
-        command = 'python3 {0}/{1}/tester.py {2}'.format(os.getcwd(), self.directory_name,
-                                                         str(self.should_show_output.get()))
-        command_run = "x-terminal-emulator -e 'bash -c \"" + command + "\"'"
-        os.system(command_run)
+        should_show_output = "TRUE" if self.should_show_output.get() else ""
+        command = 'python3 %s/%s/tester.py %s' % (os.getcwd(), self.directory_name,
+                                                  should_show_output)
+        subprocess.getstatusoutput("x-terminal-emulator -e '%s'" % command)
+
         self.reset_progressbar()
 
     def tester(self):
@@ -150,11 +146,11 @@ class Parser:
         threading.Thread(target=self.start_testing).start()
         self.reset_progressbar()
 
-    def parser(self, event=None):
+    def parse(self):
         """This function gets called when the Parse ttk.Button is clicked or
         Enter is pressed in the problem link entry"""
 
-        main_thread = threading.Thread(target=self.start_parsing, args=())
+        main_thread = threading.Thread(target=self._parse)
         # start the threads to work simultaneously
         self.start_progressbar()
         main_thread.start()
@@ -172,8 +168,8 @@ class Parser:
         self.progressbar.stop()
         self.set_state_for_all_buttons(tk.NORMAL)
 
-    def start_parsing(self):
-        self.problem_link = str(self.problem_link_entry.get())
+    def _parse(self):
+        self.problem_link = self.problem_link_entry.get()
 
         if not codeforces_wrapper.is_a_valid_problem_link(self.problem_link):
             self.reset_progressbar()
@@ -197,13 +193,13 @@ class Parser:
         self.directory_name = self.directory_name.replace('/', '')
         self.problem_id = self.directory_name
         # remove slash '/' form the directory name to avoid confusion
-        os.chdir(str(os.path.dirname(os.path.realpath(__file__))))
+        os.chdir(self.current_file_path)
         # change directory to the parse.py file dir
         # so when creating the problem folder it gets created in parse.py dir
-        os.system("mkdir " + self.directory_name)  # create a new folder
+        os.makedirs(self.directory_name, exist_ok=True)  # create a new folder
 
-        shutil.copyfile('utils/tester.py', self.directory_name + '/tester.py')
-        shutil.copyfile('utils/template.cpp', self.directory_name + '/main.cpp')
+        shutil.copy('utils/tester.py', self.directory_name)
+        shutil.copy('utils/template.cpp', self.directory_name)
 
         os.chdir(self.directory_name)  # go to the problem folder
 
@@ -260,7 +256,7 @@ class Parser:
         else:
             messagebox.showerror("Error", "You haven't parsed any problems yet!")
 
-    def codeforces_submit(self):
+    def submit(self):
         self.set_state_for_all_buttons(tk.DISABLED)
         return_value = codeforces_wrapper.CF_NOT_SUBMITTED_YET
         last_submit_id = None
