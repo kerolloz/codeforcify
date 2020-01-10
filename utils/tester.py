@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 import sys
@@ -42,7 +43,7 @@ def compare_outputs_of_test(test_num):
 def show_output(test_num):
     with open('%s/my_out%s' % (current_directory, test_num), 'r') as fin:
         print('----OUTPUT----')
-        print(fin.read(), end='')
+        print(fin.read())
         print('--------------')
 
 
@@ -52,11 +53,13 @@ def quit_tester():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--custom", help="run solution with custom input", action="store_true")
+    parser.add_argument("--show_output", help="show output of solution", action="store_true")
+    args = parser.parse_args()
+
     current_directory = get_current_directory()
     test_cases = get_number_of_test_cases()
-
-    # if no show output argument is provided
-    should_show_output = sys.argv[1] if len(sys.argv) > 1 else False
 
     cprint('Compiling...\n', 'white', attrs=['dark'])
 
@@ -68,6 +71,12 @@ if __name__ == '__main__':
                "Please, Check your code!", 'red', attrs=['bold'])
         quit_tester()
         # stop and close the program
+
+    if args.custom:
+        subprocess.getstatusoutput("{0}/main > {0}/my_out_custom".format(current_directory))
+        if args.show_output:
+            show_output("_custom")
+        quit_tester()
 
     if test_cases == 0:
         cprint("No available test cases!", color="red")
@@ -88,7 +97,7 @@ if __name__ == '__main__':
             is_accepted = False
             cprint(' Wrong Answer', 'red')
 
-        if should_show_output:
+        if args.show_output:
             show_output(test_num)
 
     print()

@@ -19,7 +19,7 @@ class Parser:
         self.problem_id = 0
         self.robo_browser = logged_in_browser
         self.problem_link = None
-        self.username, _, self.api_key, self.api_secret = user_data
+        self.username, _, self.api_key, self.api_secret = user_data.values()
 
         self.current_file_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -92,29 +92,32 @@ class Parser:
                                        command=self.parse)
         self.parse_button.pack(pady=5)
 
-        # --- Test button ---
-        self.test_button = ttk.Button(self.main_frame, text="Test",
-                                      command=self.tester)
-        self.test_button.pack(pady=5)
-
         # --- show output checkbox ---
         self.should_show_output = tk.BooleanVar()
+        self.should_show_output.set(True)
         self.show_output_checkbox = ttk.Checkbutton(self.main_frame, text="Show Output",
                                                     variable=self.should_show_output)
         self.show_output_checkbox.pack(pady=5)
+
+        # --- Test button ---
+        self.test_button = ttk.Button(self.main_frame, text="Test",
+                                      command=self.test)
+        self.test_button.pack(pady=5)
+
+        # --- Custom Test button ---
+        self.custom_test_button = ttk.Button(self.main_frame, text="Custom Test",
+                                             command=lambda: self.test(custom_test=True))
+        self.custom_test_button.pack(pady=5)
 
         # --- Submit button ---
         self.submit_button = ttk.Button(self.main_frame, text="Submit",
                                         command=self.submit)
         self.submit_button.pack(pady=5)
 
-        # --- Remove files button ---
-        self.remove_files_button = ttk.Button(self.main_frame, text="Remove Files",
-                                              command=self.remove_parsed_problem_files)
-        self.remove_files_button.pack(pady=5)
+        # --- Buttons List ---
+        self.buttons = [self.parse_button, self.test_button, self.custom_test_button, self.submit_button]
 
         # --- status bar ---
-
         self.status_bar = ttk.Label(self.main_frame, text="\nStatus: Ok\n", )
         self.status_bar.pack(pady=5)
 
@@ -124,49 +127,42 @@ class Parser:
 
         self.root.mainloop()
 
-    def start_testing(self):
-        """This function starts the command line tester"""
-        self.start_progressbar()
-        should_show_output = "TRUE" if self.should_show_output.get() else ""
-        command = 'python3 %s/%s/tester.py %s' % (os.getcwd(), self.directory_name,
-                                                  should_show_output)
-        subprocess.getstatusoutput("x-terminal-emulator -e '%s'" % command)
-
-        self.reset_progressbar()
-
-    def tester(self):
-        """this function gets called when the Test ttk.Button is clicked"""
-
-        if self.directory_name == '':
-            tk.messagebox.showerror(
-                'Problem error', "You haven't parsed any problems yet")
-            return
-
-        self.start_progressbar()
-        threading.Thread(target=self.start_testing).start()
-        self.reset_progressbar()
-
-    def parse(self):
-        """This function gets called when the Parse ttk.Button is clicked or
-        Enter is pressed in the problem link entry"""
-
-        main_thread = threading.Thread(target=self._parse)
-        # start the threads to work simultaneously
-        self.start_progressbar()
-        main_thread.start()
-
     def start_progressbar(self):
         self.set_state_for_all_buttons(tk.DISABLED)
         # create a thread for the progressbar, thread for the main program "parser"
         progress_speed = 8  # progressbar running speed
         progressbar_thread = threading.Thread(
-            target=self.progressbar.start(progress_speed), args=())
+            target=self.progressbar.start, args=(progress_speed,))
         progressbar_thread.start()
 
     def reset_progressbar(self):
         self.progress.set(0.0)
         self.progressbar.stop()
         self.set_state_for_all_buttons(tk.NORMAL)
+
+    def test(self, custom_test=False):
+        """this function gets called when the Test ttk.Button is clicked"""
+        if self.directory_name == '':
+            tk.messagebox.showerror(
+                'Problem error', "You haven't parsed any problems yet")
+            return
+        self.start_progressbar()
+        threading.Thread(target=self._test, args=(custom_test,)).start()
+
+    def _test(self, custom_test=False):
+        """This function starts the command line tester"""
+        custom_test = "--custom" if custom_test else ""
+        should_show_output = "--show_output" if self.should_show_output.get() else ""
+        command = 'python3 %s/%s/tester.py %s %s' % (os.getcwd(), self.directory_name,
+                                                     should_show_output, custom_test)
+        subprocess.getstatusoutput("x-terminal-emulator -e '%s'" % command)
+        self.reset_progressbar()
+
+    def parse(self):
+        """This function gets called when the Parse ttk.Button is clicked or
+        Enter is pressed in the problem link entry"""
+        self.start_progressbar()
+        threading.Thread(target=self._parse).start()
 
     def _parse(self):
         self.problem_link = self.problem_link_entry.get()
@@ -179,8 +175,8 @@ class Parser:
         try:
             self.robo_browser.open(self.problem_link, timeout=10)
             self.set_status_bar_to("\nStatus: Opening problem link..\n")
-
-        except Exception:
+        except Exception as e:
+            print(e)
             self.reset_progressbar()
             messagebox.showerror('Connection TimeOut', 'Check your internet connection or the problem link')
             return
@@ -210,6 +206,7 @@ class Parser:
         html_souped = BeautifulSoup(my_html, features="html.parser")
 
         input_output_list = get_tags_contents(html_souped, 'pre')
+
         # using BeautifulSoup, return strings between "pre" tags
         # "pre" is the tag that contains test cases, whether input or output
 
@@ -218,10 +215,10 @@ class Parser:
 
         index = 0
         for test in test_cases:
-            with open('in' + str(index), 'w') as in_file:
+            with open('in%d' % index, 'w') as in_file:
                 input_content = ''.join(test[0]).strip()
                 in_file.write(input_content)
-            with open('out' + str(index), 'w') as out_file:
+            with open('out%d' % index, 'w') as out_file:
                 output = ''.join(test[1]).strip()
                 out_file.write(output)
             index += 1
@@ -231,30 +228,17 @@ class Parser:
 
         os.chdir('..')  # go to the previous directory "parse.py" directory
 
-        self.reset_progressbar()
-
         self.set_status_bar_to("\nStatus: Opening your editor\n")
-        messagebox.showinfo(
-            'CF Parser', 'Problem has been parsed Successfully!')
-
+        self.reset_progressbar()
         self.set_status_bar_to("\nStatus: Ok\n")
 
         # open the code using the chosen editor
-        os.system(
-            self.editor_run_command[self.editor_choice_name.get()] + ' ' + self.directory_name + '/main.cpp')
+        subprocess.getstatusoutput(
+            '%s %s/main.cpp' % (self.editor_run_command[self.editor_choice_name.get()], self.directory_name))
 
     def set_state_for_all_buttons(self, state):
-        self.submit_button.config(state=state)
-        self.test_button.config(state=state)
-        self.parse_button.config(state=state)
-        self.remove_files_button.config(state=state)
-
-    def remove_parsed_problem_files(self):
-        if self.directory_name:
-            os.system("rm -r " + self.directory_name)
-            self.set_status_bar_to("Status: Problem Files\nHave Been Deleted\nSuccessfully!")
-        else:
-            messagebox.showerror("Error", "You haven't parsed any problems yet!")
+        for button in self.buttons:
+            button.config(state=state)
 
     def submit(self):
         self.set_state_for_all_buttons(tk.DISABLED)
