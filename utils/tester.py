@@ -73,9 +73,7 @@ if __name__ == '__main__':
         # stop and close the program
 
     if args.custom:
-        subprocess.getstatusoutput("{0}/main > {0}/my_out_custom".format(current_directory))
-        if args.show_output:
-            show_output("_custom")
+        subprocess.call("{0}/main".format(current_directory), shell=True)
         quit_tester()
 
     if test_cases == 0:
