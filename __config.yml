@@ -1,0 +1,13 @@
+title: Codeforcify
+repository: kerolloz/codeforcify
+author:
+  name: Kerollos Magdy
+  email: kerolloz@yahoo.com
+  facebook: kerolloz
+  github: kerolloz
+  linkedin: kerolloz
+  twitter: kerolloz
+
+remote_theme: YoussefRaafatNasry/portfolYOU
+plugins:
+  - jemoji
