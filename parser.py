@@ -195,7 +195,7 @@ class Parser:
         os.makedirs(self.directory_name, exist_ok=True)  # create a new folder
 
         shutil.copy('utils/tester.py', self.directory_name)
-        shutil.copy('utils/template.cpp', self.directory_name)
+        shutil.copyfile('utils/template.cpp', self.directory_name + '/main.cpp')
 
         os.chdir(self.directory_name)  # go to the problem folder
 
