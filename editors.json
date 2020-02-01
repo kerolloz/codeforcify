@@ -1,10 +1,10 @@
 {
+  "Visual Studio Code": "code",
   "Geany": "geany",
   "Atom": "atom",
   "Brackets": "brackets",
   "Sublime": "subl",
   "Code::Blocks": "codeblocks",
   "Clion": "clion",
-  "Gedit": "gedit",
-  "Visual Studio Code": "code"
+  "Gedit": "gedit"
 }
