@@ -234,7 +234,7 @@ class Parser:
 
         # open the code using the chosen editor
         subprocess.getstatusoutput(
-            '%s %s/main.cpp' % (self.editor_run_command[self.editor_choice_name.get()], self.directory_name))
+            '{0} {1} {1}/main.cpp'.format(self.editor_run_command[self.editor_choice_name.get()], self.directory_name))
 
     def set_state_for_all_buttons(self, state):
         for button in self.buttons:
