@@ -1,7 +1,7 @@
 import json
 import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 import codeforces_wrapper
 
@@ -20,7 +20,7 @@ class Login:
 
     def __init__(self, shared_browser):
         self.user_data = None
-
+        self.is_logged_in = False
         self.root = tk.Tk()
         self.robo_browser = shared_browser
         self.root.title('CodeForces Login')
@@ -109,6 +109,7 @@ class Login:
             self.save_user_data_to_file()
         if codeforces_wrapper.login(self.robo_browser, self.user_data):
             self.root.destroy()  # destroy the login window
+            self.is_logged_in = True
         else:
             self.login_button.config(text="Login", state=tk.NORMAL)
             tk.messagebox.showerror("Error", "Something went wrong")
