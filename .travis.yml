@@ -1,11 +1,13 @@
 language: python
+dist: bionic
 python:
   - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
 install:
-  - pip install -r requirements.txt
+  - pip3 install --upgrade pip
+  - pip3 install -r requirements.txt
 script:
   - python3 -m unittest tests/tests.py
   - python3 -m doctest login.py
